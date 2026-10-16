@@ -1,0 +1,35 @@
+{
+  "name": "ld60",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "npm run dev",
+    "build": "vite build # && rm -rf cordova/www && cp -r dist cordova/www",
+    "lint": "tsc && eslint .",
+    "dev": "vite --host",
+    "pack": "npm run build && rm LD60.zip && zip -r LD60.zip dist"
+  },
+  "dependencies": {
+    "@pixi/sound": "^6.0.1",
+    "@pixi/ui": "^2.3.2",
+    "motion": "^14.3.0",
+    "pixi-filters": "^6.1.5",
+    "pixi.js": "^8.17.1"
+  },
+  "devDependencies": {
+    "@assetpack/core": "^1.7.0",
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.2.0",
+    "prettier": "^3.8.2",
+    "typescript": "^6.0.2",
+    "typescript-eslint": "^8.58.1",
+    "vite": "^8.0.8"
+  },
+  "allowScripts": {
+    "sharp@0.33.5": true,
+    "sharp@0.34.5": true,
+    "cpu-features@0.0.10": true,
+    "@ffmpeg-installer/linux-x64@4.1.0": true
+  }
+}

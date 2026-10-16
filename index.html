@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<link rel="icon" type="image/png" href="/favicon.png" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link rel="stylesheet" href="/style.css" />
+		<title>Ludum Dare #60</title>
+	</head>
+	<style type="text/css">
+		html,
+		body {
+			height: 100%;
+			margin: 0;
+			-webkit-touch-callout: none; /* Safari */
+			user-select: none;
+		}
+		body {
+			display: grid;
+			place-items: center;
+			background-color: #454845;
+		}
+		#pixi-container {
+			background-color: #454845;
+			background-image: url(assets/preload/Loading.png);
+			background-position: center center;
+			background-size: auto 100%;
+		}
+		canvas {
+			display: block;
+			outline: none;
+			z-index: 1;
+			width: 100vw;
+			height: 100dvh;
+		}
+		/* #pixi-container, */
+		/* canvas { */
+		/* 	width: min(100vw, 100vh * 9/16); */
+		/* 	height: min(100vh, 100vw * 16/9); */
+		/* } */
+	</style>
+	<body>
+		<div id="pixi-container"></div>
+		<script type="module" src="/src/main.ts"></script>
+	</body>
+</html>

@@ -1,0 +1,15 @@
+{
+	"compilerOptions": {
+		"lib": ["esnext", "dom"],
+		"skipLibCheck": true,
+		"moduleResolution": "bundler",
+		"verbatimModuleSyntax": true,
+		"resolveJsonModule": true,
+		"isolatedModules": true,
+		"noEmit": true,
+		"noUnusedLocals": true,
+		"noUnusedParameters": true,
+		"noFallthroughCasesInSwitch": true
+	},
+	"include": ["src"]
+}
