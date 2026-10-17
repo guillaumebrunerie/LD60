@@ -23,9 +23,6 @@ export const calculatePos = ({ col, row }: Pos, radius = 1): XYPoint => {
 export const reversePos = ({ x, y }: XYPoint, radius = 1): Pos => {
 	const row_ = y / radius / 1.5;
 	const row = Math.round(row_);
-	if (Math.abs(row - row_) > 0.001) {
-		debugger;
-	}
 	const col = Math.round(
 		(x - (mod(row, 2) * radius * Math.sqrt(3)) / 2) / radius / Math.sqrt(3),
 	);
