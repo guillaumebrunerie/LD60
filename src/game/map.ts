@@ -123,7 +123,7 @@ export const findBestPath = (map: Map, from: Pos, to: Pos) => {
 			const elevation = map.find(
 				({ pos: p }) => p.col == otherPos.col && p.row == otherPos.row,
 			)?.elevation;
-			if (elevation == undefined || Math.abs(elevation) >= 0.1) {
+			if (elevation == undefined || elevation < -0.3 || elevation > 0.1) {
 				continue;
 			}
 

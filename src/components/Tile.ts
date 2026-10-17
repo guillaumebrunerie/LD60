@@ -3,6 +3,7 @@ import { Container } from "../PausableContainer";
 import { calculatePos, type Pos } from "../game/map";
 import type { GameMap } from "./GameMap";
 import { BASE_RADIUS, RADIUS } from "../configuration";
+import { randomItem } from "../utils/random";
 
 type TileOptions = ContainerOptions & {
 	gameMap: GameMap;
@@ -41,17 +42,33 @@ export class Tile extends Container {
 		// const id = 1;
 
 		const alpha = 1;
-		let id = 1;
-		if (this.elevation < -0.1) {
-			id = 2;
-		} else if (this.elevation > 0.1) {
-			id = 3;
+		let ids;
+		if (this.elevation < -0.3) {
+			ids = ["Blocker_Water_01"];
+		} else if (this.elevation < 0) {
+			ids = ["Grass_01", "Grass_02", "Grass_03"];
+		} else if (this.elevation < 0.1) {
+			ids = ["Ground_01", "Ground_02", "Ground_03"];
+		} else if (this.elevation < 0.2) {
+			ids = ["Mountain_Low_01"];
+		} else if (this.elevation < 0.3) {
+			ids = ["Mountain_Medium_01"];
+		} else {
+			ids = ["Mountain_High_01"];
 		}
+		const id = randomItem(ids);
+
+		// let id = 1;
+		// if (this.elevation < -0.1) {
+		// 	id = 2;
+		// } else if (this.elevation > 0.1) {
+		// 	id = 3;
+		// }
 		// const id = randomInt(1, 3);
 
 		this.addChild(
 			new Sprite({
-				texture: Assets.get(`MapTile_0${id}.png`),
+				texture: Assets.get(`MapTile_${id}.png`),
 				anchor: 0.5,
 				alpha,
 			}),
