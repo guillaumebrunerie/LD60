@@ -1,4 +1,4 @@
-import { RADIUS } from "../configuration";
+import { ELEVATION_SCALE, RADIUS } from "../configuration";
 import { mod } from "../utils/maths";
 import { PerlinNoise } from "../utils/perlinNoise";
 
@@ -14,7 +14,10 @@ export const createMap = (): Map => {
 		for (let row = -30; row <= 30; row++) {
 			const pos = { col, row };
 			const xy = calculatePos(pos, RADIUS);
-			const data = noise.sample({ x: xy.x / 500, y: xy.y / 500 });
+			const data = noise.sample({
+				x: xy.x / RADIUS / ELEVATION_SCALE,
+				y: xy.y / RADIUS / ELEVATION_SCALE,
+			});
 
 			let elevation;
 			if (data < -0.3) {

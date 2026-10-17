@@ -54,14 +54,30 @@ export class GameMap extends Container {
 		this.player = tiles.addChild(
 			new Player({ gameMap: this, pos: { col: 0, row: 0 } }),
 		);
+
+		window.addEventListener("keydown", (event) => {
+			if (event.code == "Space") {
+				this.rotate(this.player.pos, 5);
+			}
+		});
 	}
 
 	rotate(pivot: Pos, radius: number) {
+		const replacements = [];
 		for (const tile of this.tiles) {
 			if (hexDistance(tile.pos, pivot) <= radius) {
-				tile.move(rotate(tile.pos, pivot, 60));
+				const oldPos = { ...tile.pos };
+				const newPos = rotate(tile.pos, pivot, 60);
+				tile.move({ ...newPos });
+				const oldT = this.map.find(
+					(t) => t.pos.col == oldPos.col && t.pos.row == oldPos.row,
+				);
+				replacements.push([oldT, { ...oldT, pos: { ...newPos } }]);
 			}
 		}
+		this.map = this.map.map(
+			(t) => replacements.find(([a]) => a == t)?.[1] || t,
+		);
 	}
 
 	removeTarget(pos: Pos) {
