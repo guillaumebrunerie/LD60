@@ -123,7 +123,7 @@ const neighbors = (pos: Pos) => {
 	];
 };
 
-export const findBestPath = (map: Map, from: Pos, to: Pos) => {
+export const findBestPath = (map: Map, from: Pos, tos: Pos[]) => {
 	const distances: { distance: number; path: Pos[] }[][] = [];
 	const setDistance = (pos: Pos, distance: number, path: Pos[]) => {
 		const column = (distances[pos.col] ||= []);
@@ -161,7 +161,7 @@ export const findBestPath = (map: Map, from: Pos, to: Pos) => {
 		visited.push(pos);
 		const path = getPath(pos);
 		const distance = getDistance(pos);
-		if (pos.col == to.col && pos.row == to.row) {
+		if (tos.some((to) => pos.col == to.col && pos.row == to.row)) {
 			return { path, distance };
 		}
 		for (const otherPos of neighbors(pos)) {

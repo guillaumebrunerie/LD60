@@ -92,6 +92,7 @@ export class GameMap extends Container {
 	}
 
 	update(ticker: Ticker) {
+		super.update(ticker);
 		this.filters[0].time += (ticker.deltaMS / 1000) * 5;
 	}
 
@@ -113,6 +114,21 @@ export class GameMap extends Container {
 		);
 	}
 
+	maybeEatApple(pos: Pos) {
+		const apple = this.apples.children.find(
+			(apple) => apple.pos.col == pos.col && apple.pos.row == pos.row,
+		);
+		if (apple) {
+			apple.destroy();
+			apple.removeFromParent();
+			this.snake.pickTarget(
+				this.apples.children.map((apple) => apple.pos),
+			);
+			return true;
+		}
+		return false;
+	}
+
 	removeTarget(pos: Pos) {
 		const target = this.targets.children.find(
 			(target) =>
@@ -127,7 +143,7 @@ export class GameMap extends Container {
 		const pathAndDistance = findBestPath(
 			this.map,
 			this.player.lastStep() || this.player.pos,
-			pos,
+			[pos],
 		);
 		if (!pathAndDistance) {
 			return;
@@ -136,7 +152,7 @@ export class GameMap extends Container {
 		for (const step of path) {
 			this.player.nextSteps.push(step);
 			this.targets.addChild(new Target({ gameMap: this, pos: step }));
-			this.snake.nextSteps.push(step);
+			// this.snake.nextSteps.push(step);
 		}
 	}
 }

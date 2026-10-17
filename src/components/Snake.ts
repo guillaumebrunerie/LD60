@@ -23,9 +23,6 @@ export class Snake extends Container {
 		{ col: 0, row: 0 },
 		{ col: 1, row: 0 },
 		{ col: 2, row: 0 },
-		{ col: 3, row: 0 },
-		{ col: 4, row: 0 },
-		{ col: 5, row: 0 },
 	];
 	nextSteps: Pos[] = [];
 	timer = 0;
@@ -120,16 +117,21 @@ export class Snake extends Container {
 	}
 
 	pickTarget(apples: Pos[]) {
-		// const bestPathAndDistance;
-		// for (const apple of apples) {
-		// 	const pathAndDistance = findBestPath(
-		// 		this.gameMap.map,
-		// 		this.parts.children[0].pos,
-		// 		apple,
-		// 	);
-		// }
+		const pathAndDistance = findBestPath(
+			this.gameMap.map,
+			this.parts.children[0].pos,
+			apples,
+		);
+		if (!pathAndDistance) {
+			return;
+		}
+		const { path } = pathAndDistance;
+		for (const pos of path) {
+			this.nextSteps.push(pos);
+		}
 	}
 
+	isGrowing = false;
 	moveTo(newPos: Pos) {
 		const head = this.parts.children[0];
 		const afterHead = this.parts.children[1];
@@ -143,10 +145,17 @@ export class Snake extends Container {
 			0,
 		);
 		head.changeType(this.createPart(head.pos, newPos, afterHead.pos));
-		beforeTail.changeType(
-			this.createPart(beforeTail.pos, beforeTail2.pos, undefined),
-		);
-		tail.destroy();
+		if (!this.isGrowing) {
+			beforeTail.changeType(
+				this.createPart(beforeTail.pos, beforeTail2.pos, undefined),
+			);
+			tail.destroy();
+		}
+		this.isGrowing = false;
+
+		if (this.gameMap.maybeEatApple(newPos)) {
+			this.isGrowing = true;
+		}
 	}
 }
 
