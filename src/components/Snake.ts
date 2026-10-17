@@ -109,6 +109,8 @@ export class Snake extends Container {
 	update(ticker: Ticker) {
 		if (this.timer <= 0 && this.nextSteps.length > 0) {
 			this.moveTo(this.nextSteps.shift()!);
+			this.nextSteps = [];
+			this.pickTarget(this.gameMap.apples);
 		}
 
 		if (this.timer <= 0) {
@@ -197,6 +199,7 @@ class SnakePart extends Container {
 			new Sprite({
 				anchor: 0.5,
 				texture: getSnakeTexture(options.type),
+				eventMode: "none",
 			}),
 		);
 	}
@@ -207,6 +210,7 @@ class SnakePart extends Container {
 			new Sprite({
 				anchor: 0.5,
 				texture: getSnakeTexture(options.type),
+				eventMode: "none",
 			}),
 		);
 		this.rotation = options.rotation || 0;

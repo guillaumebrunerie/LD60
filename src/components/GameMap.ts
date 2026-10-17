@@ -105,6 +105,12 @@ export class GameMap extends Container {
 				replacements.push([oldT, { ...oldT, pos: { ...newPos } }]);
 			}
 		}
+		for (const apple of this.apples.children) {
+			if (hexDistance(apple.pos, pivot) <= radius) {
+				const newPos = rotate(apple.pos, pivot, 60 * steps);
+				apple.move(newPos);
+			}
+		}
 		this.map.tiles = this.map.tiles.map(
 			(t) => replacements.find(([a]) => a == t)?.[1] || t,
 		);

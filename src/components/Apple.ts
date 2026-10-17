@@ -26,4 +26,10 @@ export class Apple extends Container {
 			}),
 		);
 	}
+
+	move(pos: Pos) {
+		const xy = calculatePos(pos, RADIUS);
+		this.animate(this, { ...xy }, { duration: 0.5 });
+		this.pos = pos;
+	}
 }
