@@ -1,13 +1,21 @@
+import { RADIUS } from "../configuration";
 import { mod } from "../utils/maths";
+import { PerlinNoise } from "../utils/perlinNoise";
 
 export type Pos = { col: number; row: number };
 export type XYPoint = { x: number; y: number };
 
-export const createMap = () => {
-	const map: Pos[] = [];
-	for (let col = -10; col <= 10; col++) {
-		for (let row = -10; row <= 10; row++) {
-			map.push({ col, row });
+export type Map = { pos: Pos; elevation: number }[];
+
+export const createMap = (): Map => {
+	const noise = new PerlinNoise({ width: 5, height: 5 });
+	const map: Map = [];
+	for (let col = -30; col <= 30; col++) {
+		for (let row = -30; row <= 30; row++) {
+			const pos = { col, row };
+			const xy = calculatePos(pos, RADIUS);
+			const elevation = noise.sample({ x: xy.x / 300, y: xy.y / 300 });
+			map.push({ pos, elevation });
 		}
 	}
 	return map;
@@ -56,4 +64,81 @@ export const rotate = (pos: Pos, pivot: Pos, angle = 60): Pos => {
 	};
 	const newPosXY = { x: pivotXY.x + newDelta.x, y: pivotXY.y + newDelta.y };
 	return reversePos(newPosXY);
+};
+
+const neighbors = (pos: Pos) => {
+	const e = mod(pos.row, 2);
+	return [
+		{ col: pos.col - 1, row: pos.row },
+		{ col: pos.col + e - 1, row: pos.row - 1 },
+		{ col: pos.col + e, row: pos.row - 1 },
+		{ col: pos.col + 1, row: pos.row },
+		{ col: pos.col + e, row: pos.row + 1 },
+		{ col: pos.col + e - 1, row: pos.row + 1 },
+	];
+};
+
+export const findBestPath = (map: Map, from: Pos, to: Pos) => {
+	const distances: { distance: number; path: Pos[] }[][] = [];
+	const setDistance = (pos: Pos, distance: number, path: Pos[]) => {
+		const column = (distances[pos.col] ||= []);
+		column[pos.row] = { distance, path };
+	};
+	const getDistance = (pos: Pos) => {
+		const column = distances[pos.col];
+		if (!column) {
+			return Infinity;
+		}
+		const cell = column[pos.row];
+		if (cell === undefined) {
+			return Infinity;
+		}
+		return cell.distance;
+	};
+	const getPath = (pos: Pos) => {
+		const column = distances[pos.col];
+		if (!column) {
+			return [];
+		}
+		const cell = column[pos.row];
+		if (cell === undefined) {
+			return [];
+		}
+		return cell.path;
+	};
+	setDistance(from, 0, []);
+
+	const toVisitNext = [from];
+	const visited: Pos[] = [];
+
+	while (toVisitNext.length > 0) {
+		const pos = toVisitNext.shift()!;
+		visited.push(pos);
+		const path = getPath(pos);
+		if (pos.col == to.col && pos.row == to.row) {
+			return path;
+		}
+		const distance = getDistance(pos);
+		for (const otherPos of neighbors(pos)) {
+			const elevation = map.find(
+				({ pos: p }) => p.col == otherPos.col && p.row == otherPos.row,
+			)?.elevation;
+			if (elevation == undefined || Math.abs(elevation) >= 0.1) {
+				continue;
+			}
+
+			const oldDistance = getDistance(otherPos);
+			const newDistance = distance + 1;
+			if (newDistance < oldDistance) {
+				setDistance(otherPos, newDistance, [...path, otherPos]);
+			}
+			if (
+				!visited.some(
+					(p) => p.col == otherPos.col && p.row == otherPos.row,
+				)
+			) {
+				toVisitNext.push(otherPos);
+			}
+		}
+	}
 };

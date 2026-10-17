@@ -24,6 +24,7 @@ class Tiles extends Container {
 type GameMapOptions = ContainerOptions & {};
 
 export class GameMap extends Container {
+	map: Map;
 	tiles: Tile[];
 	player: Player;
 
@@ -31,12 +32,12 @@ export class GameMap extends Container {
 		super(options);
 
 		const tiles = this.addChild(new Tiles({ x: 800, y: 500 }));
-		const map = createMap();
+		this.map = createMap();
 		this.tiles = [];
 
-		for (const { col, row } of map) {
+		for (const { pos, elevation } of this.map) {
 			this.tiles.push(
-				tiles.addChild(new Tile({ gameMap: this, pos: { col, row } })),
+				tiles.addChild(new Tile({ gameMap: this, pos, elevation })),
 			);
 		}
 
@@ -51,5 +52,9 @@ export class GameMap extends Container {
 				tile.move(rotate(tile.pos, pivot, 60));
 			}
 		}
+	}
+
+	addTarget(pos: Pos) {
+		this.player.addTarget(pos, this.map);
 	}
 }

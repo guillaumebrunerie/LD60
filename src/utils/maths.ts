@@ -1,4 +1,5 @@
 import { Point } from "pixi.js";
+import type { XYPoint } from "../game/map";
 
 export const randomAroundPoint = (p: Point, r: number): Point => {
 	const d = Math.sqrt(Math.random()) * r;
@@ -17,6 +18,10 @@ export function getDistanceSq(pointA: Point, pointB: Point) {
 export function getDistance(pointA: Point, pointB: Point) {
 	return Math.sqrt(getDistanceSq(pointA, pointB));
 }
+
+export const length = (vector: XYPoint) => {
+	return Math.sqrt(vector.x * vector.x + vector.y * vector.y);
+};
 
 /** Linear interpolation */
 export function lerp(a: number, b: number, t: number) {

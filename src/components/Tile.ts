@@ -2,23 +2,29 @@ import { Assets, Sprite, type ContainerOptions } from "pixi.js";
 import { Container } from "../PausableContainer";
 import { calculatePos, type Pos } from "../game/map";
 import type { GameMap } from "./GameMap";
-import { randomInt, randomRange } from "../utils/random";
-import { RADIUS } from "../configuration";
+import { BASE_RADIUS, RADIUS } from "../configuration";
 
-type TileOptions = ContainerOptions & { gameMap: GameMap; pos: Pos };
+type TileOptions = ContainerOptions & {
+	gameMap: GameMap;
+	pos: Pos;
+	elevation: number;
+};
 
 export class Tile extends Container {
 	pos: Pos;
+	elevation: number;
 	gameMap: GameMap;
 
 	constructor(options: TileOptions) {
 		super({
 			...options,
 			...calculatePos(options.pos, RADIUS),
+			scale: RADIUS / BASE_RADIUS,
 			interactive: true,
 		});
 		this.gameMap = options.gameMap;
 		this.pos = options.pos;
+		this.elevation = options.elevation;
 		// const tileG = new Graphics();
 		// // tileG.circle(0, 0, (RADIUS * Math.sqrt(3)) / 2);
 		// tileG.regularPoly(0, 0, RADIUS, 6);
@@ -31,17 +37,29 @@ export class Tile extends Container {
 		// );
 		// this.addChild(tileG);
 
-		const id = randomInt(1, 3);
+		// const alpha = (data + 1) / 2;
+		// const id = 1;
+
+		const alpha = 1;
+		let id = 1;
+		if (this.elevation < -0.1) {
+			id = 2;
+		} else if (this.elevation > 0.1) {
+			id = 3;
+		}
+		// const id = randomInt(1, 3);
 
 		this.addChild(
 			new Sprite({
 				texture: Assets.get(`MapTile_0${id}.png`),
 				anchor: 0.5,
+				alpha,
 			}),
 		);
 
 		this.onpointerdown = () => {
-			this.gameMap.rotate(this.pos, randomRange(1, 5));
+			this.gameMap.addTarget(this.pos);
+			// this.gameMap.rotate(this.pos, randomRange(1, 5));
 		};
 	}
 

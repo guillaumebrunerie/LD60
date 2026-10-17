@@ -1,14 +1,16 @@
-import { Color, Graphics, type ContainerOptions } from "pixi.js";
+import { Color, Graphics, Ticker, type ContainerOptions } from "pixi.js";
 import { Container } from "../PausableContainer";
-import { calculatePos, type Pos } from "../game/map";
+import { calculatePos, findBestPath, type Map, type Pos } from "../game/map";
 import type { GameMap } from "./GameMap";
-import { RADIUS } from "../configuration";
+import { RADIUS, SPEED } from "../configuration";
+import { length } from "../utils/maths";
 
 type PlayerOptions = ContainerOptions & { gameMap: GameMap; pos: Pos };
 
 export class Player extends Container {
 	pos: Pos;
 	gameMap: GameMap;
+	nextSteps: Pos[] = [];
 
 	constructor(options: PlayerOptions) {
 		super({
@@ -29,9 +31,38 @@ export class Player extends Container {
 		this.addChild(playerG);
 	}
 
-	move(pos: Pos) {
-		const xy = calculatePos(pos, RADIUS);
-		this.animate(this, { ...xy }, { duration: 1 });
-		this.pos = pos;
+	update(ticker: Ticker) {
+		const nextStep = this.nextSteps[0];
+		if (!nextStep) {
+			return;
+		}
+		const nextStepXY = calculatePos(nextStep, RADIUS);
+		const vector = {
+			x: nextStepXY.x - this.x,
+			y: nextStepXY.y - this.y,
+		};
+		const delta = ticker.deltaMS;
+		const distance = (delta * SPEED) / 1000;
+		if (length(vector) < distance) {
+			this.nextSteps.shift();
+			this.x = nextStepXY.x;
+			this.y = nextStepXY.y;
+			this.pos = nextStep;
+		} else {
+			const angle = Math.atan2(vector.y, vector.x);
+			this.x += Math.cos(angle) * distance;
+			this.y += Math.sin(angle) * distance;
+		}
+	}
+
+	addTarget(pos: Pos, map: Map) {
+		const path = findBestPath(map, this.pos, pos);
+		if (!path) {
+			return;
+		}
+		for (const step of path) {
+			this.nextSteps.push(step);
+		}
+		// this.nextSteps.push(pos);
 	}
 }
