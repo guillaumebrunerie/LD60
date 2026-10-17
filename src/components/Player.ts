@@ -1,6 +1,6 @@
 import { Color, Graphics, Ticker, type ContainerOptions } from "pixi.js";
 import { Container } from "../PausableContainer";
-import { calculatePos, findBestPath, type Map, type Pos } from "../game/map";
+import { calculatePos, type Pos } from "../game/map";
 import type { GameMap } from "./GameMap";
 import { RADIUS, SPEED } from "../configuration";
 import { length } from "../utils/maths";

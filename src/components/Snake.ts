@@ -7,7 +7,7 @@ import {
 	type ContainerOptions,
 } from "pixi.js";
 import { Container } from "../PausableContainer";
-import { calculatePos, type Pos } from "../game/map";
+import { calculatePos, findBestPath, type Pos } from "../game/map";
 import type { GameMap } from "./GameMap";
 import { BASE_RADIUS, RADIUS } from "../configuration";
 import { mod } from "../utils/maths";
@@ -33,6 +33,7 @@ export class Snake extends Container {
 	constructor(options: SnakeOptions) {
 		super({
 			...options,
+			eventMode: "none",
 		});
 		this.gameMap = options.gameMap;
 
@@ -118,6 +119,17 @@ export class Snake extends Container {
 		this.timer -= ticker.deltaMS;
 	}
 
+	pickTarget(apples: Pos[]) {
+		// const bestPathAndDistance;
+		// for (const apple of apples) {
+		// 	const pathAndDistance = findBestPath(
+		// 		this.gameMap.map,
+		// 		this.parts.children[0].pos,
+		// 		apple,
+		// 	);
+		// }
+	}
+
 	moveTo(newPos: Pos) {
 		const head = this.parts.children[0];
 		const afterHead = this.parts.children[1];
@@ -167,6 +179,7 @@ class SnakePart extends Container {
 			...options,
 			...calculatePos(options.pos, RADIUS),
 			scale: RADIUS / BASE_RADIUS,
+			eventMode: "none",
 		});
 		this.pos = options.pos;
 		this.addChild(

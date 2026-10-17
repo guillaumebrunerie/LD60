@@ -1,16 +1,22 @@
 import { ELEVATION_SCALE, RADIUS } from "../configuration";
 import { mod } from "../utils/maths";
 import { PerlinNoise } from "../utils/perlinNoise";
+import { randomInt } from "../utils/random";
 
 export type Pos = { col: number; row: number };
 export type XYPoint = { x: number; y: number };
 
-export type Map = { pos: Pos; elevation: number }[];
+export type Map = {
+	tiles: { pos: Pos; elevation: number }[];
+	apples: Pos[];
+};
 
 export const createMap = (): Map => {
 	const noise = new PerlinNoise({ width: 5, height: 5 });
-	const map: Map = [];
+	const tiles: Map["tiles"] = [];
+	const array: number[][] = [];
 	for (let col = -30; col <= 30; col++) {
+		array[col] = [];
 		for (let row = -30; row <= 30; row++) {
 			const pos = { col, row };
 			const xy = calculatePos(pos, RADIUS);
@@ -36,10 +42,28 @@ export const createMap = (): Map => {
 				elevation = 4;
 			}
 
-			map.push({ pos, elevation });
+			tiles.push({ pos, elevation });
+			array[col][row] = elevation;
 		}
 	}
-	return map;
+
+	const apples: Pos[] = [];
+	for (let k = 0; k < 10; k++) {
+		for (let tries = 0; tries < 100; tries++) {
+			const pos = {
+				col: randomInt(-20, 20),
+				row: randomInt(-20, 20),
+			};
+			const elevation = array[pos.col][pos.row];
+			if (elevation < 0 || elevation > 1) {
+				continue;
+			}
+			apples.push(pos);
+			break;
+		}
+	}
+
+	return { tiles, apples };
 };
 
 export const calculatePos = ({ col, row }: Pos, radius = 1): XYPoint => {
@@ -136,12 +160,12 @@ export const findBestPath = (map: Map, from: Pos, to: Pos) => {
 		const pos = toVisitNext.shift()!;
 		visited.push(pos);
 		const path = getPath(pos);
-		if (pos.col == to.col && pos.row == to.row) {
-			return path;
-		}
 		const distance = getDistance(pos);
+		if (pos.col == to.col && pos.row == to.row) {
+			return { path, distance };
+		}
 		for (const otherPos of neighbors(pos)) {
-			const elevation = map.find(
+			const elevation = map.tiles.find(
 				({ pos: p }) => p.col == otherPos.col && p.row == otherPos.row,
 			)?.elevation;
 			if (elevation == undefined || elevation < 0 || elevation > 1) {
