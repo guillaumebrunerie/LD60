@@ -15,6 +15,7 @@ import { Snake } from "./Snake";
 import { Apple } from "./Apple";
 import { randomInt } from "../utils/random";
 import { CRTFilter } from "pixi-filters";
+import { CRT_CONFIGURATION } from "../configuration";
 
 type TilesOptions = ContainerOptions & {
 	// setPlayerTarget: (i: number, j: number) => void;
@@ -46,14 +47,7 @@ export class GameMap extends Container {
 	constructor(options: GameMapOptions) {
 		super(options);
 
-		this.filters = [
-			new CRTFilter({
-				curvature: 1,
-				lineWidth: 2,
-				lineContrast: 0.5,
-				noise: 0.2,
-			}),
-		];
+		this.filters = [new CRTFilter(CRT_CONFIGURATION)];
 
 		const tiles = this.addChild(new Tiles({ x: 800, y: 500 }));
 		this.map = createMap();
@@ -93,7 +87,8 @@ export class GameMap extends Container {
 
 	update(ticker: Ticker) {
 		super.update(ticker);
-		this.filters[0].time += (ticker.deltaMS / 1000) * 5;
+		this.filters[0].time +=
+			(ticker.deltaMS / 1000) * CRT_CONFIGURATION.speed;
 	}
 
 	rotate(pivot: Pos, radius: number, steps: number) {
