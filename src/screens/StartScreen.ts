@@ -20,7 +20,7 @@ export class StartScreen extends Container {
 
 		container.addChild(
 			new Sprite({
-				texture: Assets.get("Logo.jpg"),
+				texture: Assets.get("Logo.png"),
 				anchor: 0.5,
 			}),
 		);

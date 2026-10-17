@@ -1,7 +1,13 @@
 import { type ContainerOptions } from "pixi.js";
 import { Container } from "../PausableContainer";
 import { Tile } from "./Tile";
-import { createMap, hexDistance, rotate, type Pos } from "../game/map";
+import {
+	createMap,
+	findBestPath,
+	hexDistance,
+	rotate,
+	type Pos,
+} from "../game/map";
 import { Player } from "./Player";
 
 type TilesOptions = ContainerOptions & {
@@ -55,6 +61,12 @@ export class GameMap extends Container {
 	}
 
 	addTarget(pos: Pos) {
-		this.player.addTarget(pos, this.map);
+		const path = findBestPath(this.map, this.player.pos, pos);
+		if (!path) {
+			return;
+		}
+		for (const step of path) {
+			this.player.nextSteps.push(step);
+		}
 	}
 }

@@ -55,14 +55,7 @@ export class Player extends Container {
 		}
 	}
 
-	addTarget(pos: Pos, map: Map) {
-		const path = findBestPath(map, this.pos, pos);
-		if (!path) {
-			return;
-		}
-		for (const step of path) {
-			this.nextSteps.push(step);
-		}
-		// this.nextSteps.push(pos);
+	lastStep() {
+		return this.nextSteps[this.nextSteps.length - 1];
 	}
 }
