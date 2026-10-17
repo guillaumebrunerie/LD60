@@ -23,7 +23,9 @@ export class Snake extends Container {
 		{ col: 0, row: 0 },
 		{ col: 1, row: 0 },
 		{ col: 2, row: 0 },
-		{ col: 2, row: 1 },
+		{ col: 3, row: 0 },
+		{ col: 4, row: 0 },
+		{ col: 5, row: 0 },
 	];
 	nextSteps: Pos[] = [];
 	timer = 0;
@@ -36,45 +38,73 @@ export class Snake extends Container {
 
 		this.parts = this.addChild(new Container<SnakePart>());
 		this.positions.forEach((pos, i) => {
-			let type: SnakePartType;
-			if (i == 0) {
-				type = "head";
-			} else if (i == this.positions.length - 1) {
-				type = "tail";
-			} else {
-				const xy = calculatePos(pos, RADIUS);
-				const prevXY = calculatePos(this.positions[i - 1], RADIUS);
-				const nextXY = calculatePos(this.positions[i + 1], RADIUS);
-				const angle =
-					Math.atan2(nextXY.y - xy.y, nextXY.x - xy.x) -
-					Math.atan2(prevXY.y - xy.y, prevXY.x - xy.x);
-				const steps = Math.round(
-					mod((angle * 180) / Math.PI, 360) / 60,
-				);
-				switch (steps) {
-					default:
-						type = "tail";
-						debugger;
-						break;
-					case 1:
-					case 5:
-						type = "body-sharp";
-						break;
-					case 2:
-					case 4:
-						type = "body-soft";
-						break;
-					case 3:
-						type = "body-straight";
-				}
-			}
 			this.parts.addChild(
-				new SnakePart({
-					pos,
-					type,
-				}),
+				new SnakePart(
+					this.createPart(
+						pos,
+						this.positions[i - 1],
+						this.positions[i + 1],
+					),
+				),
 			);
 		});
+	}
+
+	createPart(
+		pos: Pos,
+		prev: Pos | undefined,
+		next: Pos | undefined,
+	): SnakePartOptions {
+		let type: SnakePartType;
+		let rotation;
+		const xy = calculatePos(pos, RADIUS);
+		if (!prev) {
+			type = "head";
+			const nextXY = calculatePos(next!, RADIUS);
+			rotation = Math.atan2(nextXY.y - xy.y, nextXY.x - xy.x);
+		} else if (!next) {
+			type = "tail";
+			const prevXY = calculatePos(prev, RADIUS);
+			rotation = Math.atan2(prevXY.y - xy.y, prevXY.x - xy.x) + Math.PI;
+		} else {
+			const prevXY = calculatePos(prev, RADIUS);
+			const nextXY = calculatePos(next, RADIUS);
+			const angle2 =
+				Math.atan2(nextXY.y - xy.y, nextXY.x - xy.x) -
+				Math.atan2(prevXY.y - xy.y, prevXY.x - xy.x);
+			const steps = Math.round(mod((angle2 * 180) / Math.PI, 360) / 60);
+			switch (steps) {
+				default:
+					type = "tail";
+					// debugger;
+					break;
+				case 1:
+					type = "body-sharp";
+					rotation = Math.atan2(nextXY.y - xy.y, nextXY.x - xy.x);
+					break;
+				case 2:
+					type = "body-soft";
+					rotation = Math.atan2(nextXY.y - xy.y, nextXY.x - xy.x);
+					break;
+				case 3:
+					type = "body-straight";
+					rotation = Math.atan2(prevXY.y - xy.y, prevXY.x - xy.x);
+					break;
+				case 4:
+					type = "body-soft";
+					rotation = Math.atan2(prevXY.y - xy.y, prevXY.x - xy.x);
+					break;
+				case 5:
+					type = "body-sharp";
+					rotation = Math.atan2(prevXY.y - xy.y, prevXY.x - xy.x);
+					break;
+			}
+		}
+		return {
+			pos,
+			type,
+			rotation,
+		};
 	}
 
 	update(ticker: Ticker) {
@@ -90,15 +120,20 @@ export class Snake extends Container {
 
 	moveTo(newPos: Pos) {
 		const head = this.parts.children[0];
+		const afterHead = this.parts.children[1];
+		const beforeTail2 = this.parts.children.at(-3)!;
+		const beforeTail = this.parts.children.at(-2)!;
 		const tail = this.parts.children.at(-1)!;
+
+		// New head
 		this.parts.addChildAt(
-			new SnakePart({
-				pos: newPos,
-				type: "head",
-			}),
+			new SnakePart(this.createPart(newPos, undefined, head.pos)),
 			0,
 		);
-		head.makeBody();
+		head.changeType(this.createPart(head.pos, newPos, afterHead.pos));
+		beforeTail.changeType(
+			this.createPart(beforeTail.pos, beforeTail2.pos, undefined),
+		);
 		tail.destroy();
 	}
 }
@@ -126,12 +161,14 @@ const getSnakeTexture = (type: SnakePartType) => {
 };
 
 class SnakePart extends Container {
+	pos: Pos;
 	constructor(options: SnakePartOptions) {
 		super({
 			...options,
 			...calculatePos(options.pos, RADIUS),
 			scale: RADIUS / BASE_RADIUS,
 		});
+		this.pos = options.pos;
 		this.addChild(
 			new Sprite({
 				anchor: 0.5,
@@ -140,18 +177,14 @@ class SnakePart extends Container {
 		);
 	}
 
-	makeBody() {
+	changeType(options: SnakePartOptions) {
 		this.removeChildren();
-
-		const partG = new Graphics();
-		partG.circle(0, 0, 20);
-		partG.fill(
-			new Color({
-				r: 0,
-				g: 0,
-				b: 255,
+		this.addChild(
+			new Sprite({
+				anchor: 0.5,
+				texture: getSnakeTexture(options.type),
 			}),
 		);
-		this.addChild(partG);
+		this.rotation = options.rotation || 0;
 	}
 }

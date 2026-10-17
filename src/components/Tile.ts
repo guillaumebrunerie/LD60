@@ -1,4 +1,12 @@
-import { Assets, Sprite, type ContainerOptions } from "pixi.js";
+import {
+	Assets,
+	Color,
+	Graphics,
+	Point,
+	Polygon,
+	Sprite,
+	type ContainerOptions,
+} from "pixi.js";
 import { Container } from "../PausableContainer";
 import { calculatePos, type Pos } from "../game/map";
 import type { GameMap } from "./GameMap";
@@ -26,17 +34,18 @@ export class Tile extends Container {
 		this.gameMap = options.gameMap;
 		this.pos = options.pos;
 		this.elevation = options.elevation;
-		// const tileG = new Graphics();
-		// // tileG.circle(0, 0, (RADIUS * Math.sqrt(3)) / 2);
-		// tileG.regularPoly(0, 0, RADIUS, 6);
-		// tileG.fill(
-		// 	new Color({
-		// 		r: Math.random() * 255,
-		// 		g: Math.random() * 255,
-		// 		b: Math.random() * 255,
-		// 	}),
-		// );
-		// this.addChild(tileG);
+
+		const a = BASE_RADIUS;
+		const b = (BASE_RADIUS * Math.sqrt(3)) / 2;
+		const c = BASE_RADIUS / 2;
+		this.hitArea = new Polygon([
+			new Point(0, a),
+			new Point(b, c),
+			new Point(b, -c),
+			new Point(0, -a),
+			new Point(-b, -c),
+			new Point(-b, c),
+		]);
 
 		// const alpha = (data + 1) / 2;
 		// const id = 1;
