@@ -1,4 +1,4 @@
-import { ELEVATION_SCALE, RADIUS } from "../configuration";
+import { ELEVATION_SCALE, HEIGHT, RADIUS, WIDTH } from "../configuration";
 import { mod } from "../utils/maths";
 import { PerlinNoise } from "../utils/perlinNoise";
 import { randomInt } from "../utils/random";
@@ -16,9 +16,9 @@ export const createMap = (): Map => {
 	const noise = new PerlinNoise({ width: 5, height: 5 });
 	const tiles: Map["tiles"] = [];
 	const array: number[][] = [];
-	for (let col = -30; col <= 30; col++) {
+	for (let col = 0; col < WIDTH; col++) {
 		array[col] = [];
-		for (let row = -30; row <= 30; row++) {
+		for (let row = 0; row < HEIGHT; row++) {
 			const pos = { col, row };
 			const xy = calculatePos(pos, RADIUS);
 			const data = noise.sample({
@@ -60,8 +60,8 @@ export const createMap = (): Map => {
 export const addApple = (map: Map) => {
 	for (let tries = 0; tries < 100; tries++) {
 		const pos = {
-			col: randomInt(-20, 20),
-			row: randomInt(-20, 20),
+			col: randomInt(0, WIDTH - 1),
+			row: randomInt(0, HEIGHT - 1),
 		};
 		const elevation = map.array[pos.col][pos.row];
 		if (elevation < 0 || elevation > 1) {

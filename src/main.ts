@@ -48,12 +48,12 @@ const main = async () => {
 
 	const navigation = setNavigation(app.stage.addChild(new Navigation()));
 
-	window.addEventListener("resize", () => {
-		app.renderer.resize(window.innerWidth, window.innerHeight);
+	const resize = () => {
+		app.renderer.resize(900, 1600);
 		navigation.resize(window.innerWidth, window.innerHeight);
-	});
-	app.renderer.resize(window.innerWidth, window.innerHeight);
-	navigation.resize(window.innerWidth, window.innerHeight);
+	};
+	resize();
+	window.addEventListener("resize", resize);
 
 	document.addEventListener("visibilitychange", () => {
 		if (document.hidden) {

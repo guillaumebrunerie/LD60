@@ -51,7 +51,7 @@ export class Tile extends Container {
 		// const id = 1;
 
 		const alpha = 1;
-		let ids;
+		let ids: string[] = [];
 		switch (this.elevation) {
 			case -1:
 				ids = ["Blocker_Water_01"];
@@ -90,6 +90,7 @@ export class Tile extends Container {
 		);
 
 		this.onpointerdown = () => {
+			this.gameMap.clearTargets();
 			this.gameMap.addTarget(this.pos);
 			// this.gameMap.rotate(this.pos, randomRange(1, 5));
 		};

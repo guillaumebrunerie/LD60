@@ -50,7 +50,7 @@ export class GameMap extends Container {
 
 		this.filters = [new CRTFilter(CRT_CONFIGURATION)];
 
-		const tiles = this.addChild(new Tiles({ x: 800, y: 500 }));
+		const tiles = this.addChild(new Tiles({ x: 0, y: 0 }));
 		this.map = createMap();
 
 		for (const { pos, elevation } of this.map.tiles) {
@@ -149,6 +149,11 @@ export class GameMap extends Container {
 		if (target) {
 			this.targets.removeChild(target);
 		}
+	}
+
+	clearTargets() {
+		this.player.nextSteps = [];
+		this.targets.removeChildren();
 	}
 
 	addTarget(pos: Pos) {
