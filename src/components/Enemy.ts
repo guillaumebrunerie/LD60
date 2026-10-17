@@ -21,7 +21,7 @@ export class Enemy extends Container {
 		this.pos = options.pos;
 		this.addChild(
 			new Sprite({
-				texture: Assets.get(`Apple.png`),
+				texture: Assets.get(`Enemy.png`),
 				anchor: 0.5,
 			}),
 		);

@@ -19,6 +19,7 @@ import { CRTFilter } from "pixi-filters";
 import { CRT_CONFIGURATION, HEIGHT, WIDTH } from "../configuration";
 import { RotateButton } from "./RotateButton";
 import { Enemy } from "./Enemy";
+import { Note } from "./Note";
 
 type TilesOptions = ContainerOptions & {
 	// setPlayerTarget: (i: number, j: number) => void;
@@ -45,6 +46,7 @@ export class GameMap extends Container {
 	player: Player;
 	targets: Container<Target>;
 	apples: Container<Apple>;
+	notes: Container<Note>;
 	enemies: Container<Enemy>;
 	snake: Snake;
 	rotateLeft: RotateButton;
@@ -80,6 +82,16 @@ export class GameMap extends Container {
 		for (const pos of this.map.apples) {
 			this.enemies.addChild(
 				new Enemy({
+					gameMap: this,
+					pos,
+				}),
+			);
+		}
+
+		this.notes = tiles.addChild(new Container<Note>());
+		for (const pos of this.map.notes) {
+			this.notes.addChild(
+				new Note({
 					gameMap: this,
 					pos,
 				}),

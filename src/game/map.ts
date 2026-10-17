@@ -10,6 +10,7 @@ export type Map = {
 	array: number[][];
 	tiles: { pos: Pos; elevation: number }[];
 	apples: Pos[];
+	notes: Pos[];
 };
 
 export const createMap = (): Map => {
@@ -51,16 +52,20 @@ export const createMap = (): Map => {
 		}
 	}
 
-	const map = { array, tiles, apples: [] };
+	const map = { array, tiles, apples: [], notes: [] };
 
 	for (let k = 0; k < 10; k++) {
 		addApple(map);
 	}
 
+	for (let k = 0; k < 3; k++) {
+		addNote(map);
+	}
+
 	return map;
 };
 
-export const addApple = (map: Map) => {
+export const pickAvailablePosition = (map: Map) => {
 	for (let tries = 0; tries < 100; tries++) {
 		const pos = {
 			col: randomInt(0, WIDTH - 1),
@@ -70,8 +75,22 @@ export const addApple = (map: Map) => {
 		if (elevation < 0 || elevation > 1) {
 			continue;
 		}
-		map.apples.push(pos);
 		return pos;
+	}
+};
+
+export const addApple = (map: Map) => {
+	const pos = pickAvailablePosition(map);
+	if (pos) {
+		map.apples.push(pos);
+	}
+	return pos;
+};
+
+export const addNote = (map: Map) => {
+	const pos = pickAvailablePosition(map);
+	if (pos) {
+		map.notes.push(pos);
 	}
 };
 
