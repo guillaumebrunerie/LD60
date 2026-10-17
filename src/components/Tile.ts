@@ -1,12 +1,11 @@
 import { Color, Graphics, type ContainerOptions } from "pixi.js";
 import { Container } from "../PausableContainer";
-import { calculatePos, type Pos, type XYPoint } from "../game/map";
+import { calculatePos, type Pos } from "../game/map";
 import type { GameMap } from "./GameMap";
 import { randomRange } from "../utils/random";
+import { RADIUS } from "../configuration";
 
 type TileOptions = ContainerOptions & { gameMap: GameMap; pos: Pos };
-
-const RADIUS = 30;
 
 export class Tile extends Container {
 	pos: Pos;
@@ -21,6 +20,7 @@ export class Tile extends Container {
 		this.gameMap = options.gameMap;
 		this.pos = options.pos;
 		const tileG = new Graphics();
+		// tileG.circle(0, 0, (RADIUS * Math.sqrt(3)) / 2);
 		tileG.regularPoly(0, 0, RADIUS, 6);
 		tileG.fill(
 			new Color({

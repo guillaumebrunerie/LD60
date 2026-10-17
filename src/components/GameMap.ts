@@ -2,6 +2,7 @@ import { type ContainerOptions } from "pixi.js";
 import { Container } from "../PausableContainer";
 import { Tile } from "./Tile";
 import { createMap, hexDistance, rotate, type Pos } from "../game/map";
+import { Player } from "./Player";
 
 type TilesOptions = ContainerOptions & {
 	// setPlayerTarget: (i: number, j: number) => void;
@@ -24,12 +25,12 @@ type GameMapOptions = ContainerOptions & {};
 
 export class GameMap extends Container {
 	tiles: Tile[];
+	player: Player;
+
 	constructor(options: GameMapOptions) {
 		super(options);
 
-		const tiles = this.addChild(
-			new Tiles({ x: 600, y: 500 /*, angle: 15*/ }),
-		);
+		const tiles = this.addChild(new Tiles({ x: 800, y: 500 }));
 		const map = createMap();
 		this.tiles = [];
 
@@ -39,15 +40,15 @@ export class GameMap extends Container {
 			);
 		}
 
-		this.interactive = true;
-		this.onpointerdown = () => this.rotate(0, 0, 6);
+		this.player = tiles.addChild(
+			new Player({ gameMap: this, pos: { col: 0, row: 0 } }),
+		);
 	}
 
 	rotate(pivot: Pos, radius: number) {
 		for (const tile of this.tiles) {
 			if (hexDistance(tile.pos, pivot) <= radius) {
 				tile.move(rotate(tile.pos, pivot, 60));
-				// tile.move(tile.col + 20, tile.row);
 			}
 		}
 	}
