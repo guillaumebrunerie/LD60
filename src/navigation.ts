@@ -1,6 +1,7 @@
 import { Assets, BlurFilter } from "pixi.js";
 import { LoadScreen } from "./screens/LoadScreen";
 import { StartScreen } from "./screens/StartScreen";
+import { MapScreen } from "./screens/MapScreen";
 import { Container } from "./PausableContainer";
 import { PausePopup } from "./screens/PausePopup";
 import { isAndroid } from "./utils/platform";
@@ -12,7 +13,7 @@ export class Navigation extends Container {
 	}
 
 	startScreen?: StartScreen;
-	// gameScreen?: MapScreen;
+	gameScreen?: MapScreen;
 	// playgroundScreen?: PlaygroundScreen;
 
 	async loadGame() {
@@ -27,6 +28,7 @@ export class Navigation extends Container {
 		await new Promise(requestAnimationFrame);
 		this.removeChild(loadScreen);
 		this.startScreen = this.addChild(new StartScreen());
+		this.startGame();
 
 		window.addEventListener("keydown", async (event) => {
 			if (event.code == "Digit1") {
@@ -39,9 +41,9 @@ export class Navigation extends Container {
 		if (this.startScreen) {
 			this.removeChild(this.startScreen);
 		}
-		// if (this.gameScreen) {
-		// 	this.removeChild(this.gameScreen);
-		// }
+		if (this.gameScreen) {
+			this.removeChild(this.gameScreen);
+		}
 		// if (this.playgroundScreen) {
 		// 	this.removeChild(this.playgroundScreen);
 		// }
@@ -56,8 +58,8 @@ export class Navigation extends Container {
 				// Do nothing
 			}
 		}
-		// this.gameScreen = this.addChild(new MapScreen({ alpha: 0 }));
-		// await this.animate(this.gameScreen, { alpha: 1 }, { duration: 0.5 });
+		this.gameScreen = this.addChild(new MapScreen({ alpha: 0 }));
+		await this.animate(this.gameScreen, { alpha: 1 }, { duration: 0.5 });
 		if (this.startScreen) {
 			this.removeChild(this.startScreen);
 		}
@@ -66,12 +68,12 @@ export class Navigation extends Container {
 	pausePopup?: PausePopup;
 	filter: BlurFilter;
 	async pauseGame() {
-		if (this.pausePopup /* || !this.gameScreen */) {
+		if (this.pausePopup || !this.gameScreen) {
 			return;
 		}
-		// this.gameScreen.pause();
+		this.gameScreen.pause();
 
-		// this.gameScreen.filters = [this.filter];
+		this.gameScreen.filters = [this.filter];
 
 		this.pausePopup = this.addChild(new PausePopup({ alpha: 0 }));
 
@@ -82,17 +84,17 @@ export class Navigation extends Container {
 	}
 
 	async resumeGame() {
-		if (!this.pausePopup /* || !this.gameScreen */) {
+		if (!this.pausePopup || !this.gameScreen) {
 			return;
 		}
-		// this.gameScreen.resume();
+		this.gameScreen.resume();
 
 		await Promise.all([
 			this.animate(this.filter, { strength: 0 }, { duration: 0.1 }),
 			this.animate(this.pausePopup, { alpha: 0 }, { duration: 0.1 }),
 		]);
 
-		// this.gameScreen.filters = [];
+		this.gameScreen.filters = [];
 		this.removeChild(this.pausePopup);
 		this.pausePopup = undefined;
 	}
@@ -100,13 +102,13 @@ export class Navigation extends Container {
 	// Automatic blur/focus
 	blur() {
 		// Similar to pause but synchronous
-		if (this.pausePopup /* || !this.gameScreen */) {
+		if (this.pausePopup || !this.gameScreen) {
 			return;
 		}
-		// this.gameScreen.pause();
+		this.gameScreen.pause();
 
 		this.filter.strength = 3;
-		// this.gameScreen.filters = [this.filter];
+		this.gameScreen.filters = [this.filter];
 
 		this.pausePopup = this.addChild(new PausePopup());
 	}
