@@ -18,6 +18,7 @@ import { randomInt } from "../utils/random";
 import { CRTFilter } from "pixi-filters";
 import { CRT_CONFIGURATION, HEIGHT, WIDTH } from "../configuration";
 import { RotateButton } from "./RotateButton";
+import { Enemy } from "./Enemy";
 
 type TilesOptions = ContainerOptions & {
 	// setPlayerTarget: (i: number, j: number) => void;
@@ -44,6 +45,7 @@ export class GameMap extends Container {
 	player: Player;
 	targets: Container<Target>;
 	apples: Container<Apple>;
+	enemies: Container<Enemy>;
 	snake: Snake;
 	rotateLeft: RotateButton;
 	rotateRight: RotateButton;
@@ -74,17 +76,27 @@ export class GameMap extends Container {
 			}),
 		);
 
-		this.apples = tiles.addChild(new Container<Apple>());
+		this.enemies = tiles.addChild(new Container<Enemy>());
 		for (const pos of this.map.apples) {
-			this.apples.addChild(
-				new Apple({
+			this.enemies.addChild(
+				new Enemy({
 					gameMap: this,
 					pos,
 				}),
 			);
 		}
-		this.snake = tiles.addChild(new Snake({ gameMap: this }));
-		this.snake.pickTarget(this.apples);
+
+		this.apples = tiles.addChild(new Container<Apple>());
+		// for (const pos of this.map.apples) {
+		// 	this.apples.addChild(
+		// 		new Apple({
+		// 			gameMap: this,
+		// 			pos,
+		// 		}),
+		// 	);
+		// }
+		// this.snake = tiles.addChild(new Snake({ gameMap: this }));
+		// this.snake.pickTarget(this.apples);
 		this.rotateLeft = this.addChild(
 			new RotateButton({
 				x: 750,
@@ -116,7 +128,12 @@ export class GameMap extends Container {
 			(ticker.deltaMS / 1000) * CRT_CONFIGURATION.speed;
 	}
 
+	moveInProgress = false;
 	rotate(pivot: Pos, radius: number, steps: number) {
+		if (this.moveInProgress) {
+			return;
+		}
+		this.moveInProgress = true;
 		const replacements: [
 			{ pos: Pos; elevation: number },
 			{ pos: Pos; elevation: number },
@@ -132,20 +149,23 @@ export class GameMap extends Container {
 				replacements.push([oldT, { ...oldT, pos: { ...newPos } }]);
 			}
 		}
-		for (const apple of this.apples.children) {
-			if (hexDistance(apple.pos, pivot) <= radius) {
-				const newPos = rotate(apple.pos, pivot, 60 * steps);
-				apple.move(newPos);
-			}
-		}
+		// for (const apple of this.apples.children) {
+		// 	if (hexDistance(apple.pos, pivot) <= radius) {
+		// 		const newPos = rotate(apple.pos, pivot, 60 * steps);
+		// 		apple.move(newPos);
+		// 	}
+		// }
 		this.map.tiles = this.map.tiles.map(
 			(t) => replacements.find(([a]) => a == t)?.[1] || t,
 		);
 		for (const [, newT] of replacements) {
 			this.map.array[newT.pos.col][newT.pos.row] = newT.elevation;
 		}
-		this.snake.nextSteps = [];
-		this.snake.pickTarget(this.apples);
+		// this.snake.nextSteps = [];
+		// this.snake.pickTarget(this.apples);
+		setTimeout(() => {
+			this.moveInProgress = false;
+		}, 500);
 	}
 
 	maybeEatApple(pos: Pos) {
@@ -189,7 +209,7 @@ export class GameMap extends Container {
 	addTarget(pos: Pos) {
 		const pathAndDistance = findBestPath(
 			this.map,
-			this.snake.parts.children.map((part) => part.pos),
+			[], //this.snake.parts.children.map((part) => part.pos),
 			this.player.lastStep() || this.player.pos,
 			[pos],
 		);

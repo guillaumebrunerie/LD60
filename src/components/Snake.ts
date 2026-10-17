@@ -161,6 +161,10 @@ export class Snake extends Container {
 			this.isGrowing = true;
 		}
 	}
+
+	headPos() {
+		return this.parts.children[0].pos;
+	}
 }
 
 type SnakePartType =
