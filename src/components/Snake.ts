@@ -119,6 +119,7 @@ export class Snake extends Container {
 	pickTarget(apples: Pos[]) {
 		const pathAndDistance = findBestPath(
 			this.gameMap.map,
+			this.gameMap.snake.parts.children.map((part) => part.pos),
 			this.parts.children[0].pos,
 			apples,
 		);

@@ -7,6 +7,7 @@ export type Pos = { col: number; row: number };
 export type XYPoint = { x: number; y: number };
 
 export type Map = {
+	array: number[][];
 	tiles: { pos: Pos; elevation: number }[];
 	apples: Pos[];
 };
@@ -47,23 +48,28 @@ export const createMap = (): Map => {
 		}
 	}
 
-	const apples: Pos[] = [];
+	const map = { array, tiles, apples: [] };
+
 	for (let k = 0; k < 10; k++) {
-		for (let tries = 0; tries < 100; tries++) {
-			const pos = {
-				col: randomInt(-20, 20),
-				row: randomInt(-20, 20),
-			};
-			const elevation = array[pos.col][pos.row];
-			if (elevation < 0 || elevation > 1) {
-				continue;
-			}
-			apples.push(pos);
-			break;
-		}
+		addApple(map);
 	}
 
-	return { tiles, apples };
+	return map;
+};
+
+export const addApple = (map: Map) => {
+	for (let tries = 0; tries < 100; tries++) {
+		const pos = {
+			col: randomInt(-20, 20),
+			row: randomInt(-20, 20),
+		};
+		const elevation = map.array[pos.col][pos.row];
+		if (elevation < 0 || elevation > 1) {
+			continue;
+		}
+		map.apples.push(pos);
+		return pos;
+	}
 };
 
 export const calculatePos = ({ col, row }: Pos, radius = 1): XYPoint => {
@@ -123,7 +129,12 @@ const neighbors = (pos: Pos) => {
 	];
 };
 
-export const findBestPath = (map: Map, from: Pos, tos: Pos[]) => {
+export const findBestPath = (
+	map: Map,
+	blocked: Pos[],
+	from: Pos,
+	tos: Pos[],
+) => {
 	const distances: { distance: number; path: Pos[] }[][] = [];
 	const setDistance = (pos: Pos, distance: number, path: Pos[]) => {
 		const column = (distances[pos.col] ||= []);
@@ -165,6 +176,13 @@ export const findBestPath = (map: Map, from: Pos, tos: Pos[]) => {
 			return { path, distance };
 		}
 		for (const otherPos of neighbors(pos)) {
+			if (
+				blocked.some(
+					(p) => p.col == otherPos.col && p.row == otherPos.row,
+				)
+			) {
+				continue;
+			}
 			const elevation = map.tiles.find(
 				({ pos: p }) => p.col == otherPos.col && p.row == otherPos.row,
 			)?.elevation;

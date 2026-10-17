@@ -2,6 +2,7 @@ import { Ticker, type ContainerOptions } from "pixi.js";
 import { Container } from "../PausableContainer";
 import { Tile } from "./Tile";
 import {
+	addApple,
 	createMap,
 	findBestPath,
 	hexDistance,
@@ -119,6 +120,16 @@ export class GameMap extends Container {
 			this.snake.pickTarget(
 				this.apples.children.map((apple) => apple.pos),
 			);
+
+			const newApple = addApple(this.map);
+			if (newApple) {
+				this.apples.addChild(
+					new Apple({
+						gameMap: this,
+						pos: newApple,
+					}),
+				);
+			}
 			return true;
 		}
 		return false;
@@ -137,6 +148,7 @@ export class GameMap extends Container {
 	addTarget(pos: Pos) {
 		const pathAndDistance = findBestPath(
 			this.map,
+			this.snake.parts.children.map((part) => part.pos),
 			this.player.lastStep() || this.player.pos,
 			[pos],
 		);
