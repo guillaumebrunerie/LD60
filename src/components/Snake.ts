@@ -10,6 +10,7 @@ import { Container } from "../PausableContainer";
 import { calculatePos, type Pos } from "../game/map";
 import type { GameMap } from "./GameMap";
 import { BASE_RADIUS, RADIUS } from "../configuration";
+import { mod } from "../utils/maths";
 
 type SnakeOptions = ContainerOptions & {
 	gameMap: GameMap;
@@ -34,14 +35,46 @@ export class Snake extends Container {
 		this.gameMap = options.gameMap;
 
 		this.parts = this.addChild(new Container<SnakePart>());
-		for (const pos of this.positions) {
+		this.positions.forEach((pos, i) => {
+			let type: SnakePartType;
+			if (i == 0) {
+				type = "head";
+			} else if (i == this.positions.length - 1) {
+				type = "tail";
+			} else {
+				const xy = calculatePos(pos, RADIUS);
+				const prevXY = calculatePos(this.positions[i - 1], RADIUS);
+				const nextXY = calculatePos(this.positions[i + 1], RADIUS);
+				const angle =
+					Math.atan2(nextXY.y - xy.y, nextXY.x - xy.x) -
+					Math.atan2(prevXY.y - xy.y, prevXY.x - xy.x);
+				const steps = Math.round(
+					mod((angle * 180) / Math.PI, 360) / 60,
+				);
+				switch (steps) {
+					default:
+						type = "tail";
+						debugger;
+						break;
+					case 1:
+					case 5:
+						type = "body-sharp";
+						break;
+					case 2:
+					case 4:
+						type = "body-soft";
+						break;
+					case 3:
+						type = "body-straight";
+				}
+			}
 			this.parts.addChild(
 				new SnakePart({
 					pos,
-					type: pos == this.positions[0] ? "head" : "not_head",
+					type,
 				}),
 			);
-		}
+		});
 	}
 
 	update(ticker: Ticker) {
@@ -70,9 +103,26 @@ export class Snake extends Container {
 	}
 }
 
+type SnakePartType =
+	"head" | "body-sharp" | "body-soft" | "body-straight" | "tail";
 type SnakePartOptions = ContainerOptions & {
 	pos: Pos;
-	type: "head" | "not_head";
+	type: SnakePartType;
+};
+
+const getSnakeTexture = (type: SnakePartType) => {
+	switch (type) {
+		case "head":
+			return Assets.get("SnakeHead.png");
+		case "body-sharp":
+			return Assets.get("SnakeBody_02.png");
+		case "body-soft":
+			return Assets.get("SnakeBody_03.png");
+		case "body-straight":
+			return Assets.get("SnakeBody_01.png");
+		case "tail":
+			return Assets.get("SnakeEnd.png");
+	}
 };
 
 class SnakePart extends Container {
@@ -82,16 +132,12 @@ class SnakePart extends Container {
 			...calculatePos(options.pos, RADIUS),
 			scale: RADIUS / BASE_RADIUS,
 		});
-		const partG = new Graphics();
-		partG.circle(0, 0, 20);
-		partG.fill(
-			new Color({
-				r: options.type == "head" ? 255 : 0,
-				g: 0,
-				b: options.type == "head" ? 0 : 255,
+		this.addChild(
+			new Sprite({
+				anchor: 0.5,
+				texture: getSnakeTexture(options.type),
 			}),
 		);
-		this.addChild(partG);
 	}
 
 	makeBody() {
