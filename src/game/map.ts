@@ -21,12 +21,14 @@ export const createMap = (): Map => {
 
 			let elevation;
 			if (data < -0.3) {
+				// Water
 				elevation = -1;
 			} else if (data < -0.15) {
 				elevation = 0;
-			} else if (data < 0.15) {
+			} else if (data < 0.1) {
+				// Mountains
 				elevation = 1;
-			} else if (data < 0.25) {
+			} else if (data < 0.2) {
 				elevation = 2;
 			} else if (data < 0.35) {
 				elevation = 3;

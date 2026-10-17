@@ -86,9 +86,13 @@ export class Tile extends Container {
 		};
 	}
 
-	move(pos: Pos) {
+	move(pos: Pos, angle: number) {
 		const xy = calculatePos(pos, RADIUS);
-		this.animate(this, { ...xy }, { duration: 1 });
+		this.animate(
+			this,
+			{ ...xy, angle: this.angle + angle },
+			{ duration: 1 },
+		);
 		this.pos = pos;
 	}
 }
