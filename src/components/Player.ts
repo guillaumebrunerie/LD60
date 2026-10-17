@@ -48,6 +48,7 @@ export class Player extends Container {
 			this.x = nextStepXY.x;
 			this.y = nextStepXY.y;
 			this.pos = nextStep;
+			this.gameMap.removeTarget(nextStep);
 		} else {
 			const angle = Math.atan2(vector.y, vector.x);
 			this.x += Math.cos(angle) * distance;

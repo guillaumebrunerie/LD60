@@ -6,9 +6,11 @@ import {
 	findBestPath,
 	hexDistance,
 	rotate,
+	type Map,
 	type Pos,
 } from "../game/map";
 import { Player } from "./Player";
+import { Target } from "./Target";
 
 type TilesOptions = ContainerOptions & {
 	// setPlayerTarget: (i: number, j: number) => void;
@@ -31,15 +33,15 @@ type GameMapOptions = ContainerOptions & {};
 
 export class GameMap extends Container {
 	map: Map;
-	tiles: Tile[];
+	tiles: Tile[] = [];
 	player: Player;
+	targets: Container<Target>;
 
 	constructor(options: GameMapOptions) {
 		super(options);
 
 		const tiles = this.addChild(new Tiles({ x: 800, y: 500 }));
 		this.map = createMap();
-		this.tiles = [];
 
 		for (const { pos, elevation } of this.map) {
 			this.tiles.push(
@@ -50,6 +52,8 @@ export class GameMap extends Container {
 		this.player = tiles.addChild(
 			new Player({ gameMap: this, pos: { col: 0, row: 0 } }),
 		);
+
+		this.targets = tiles.addChild(new Container<Target>());
 	}
 
 	rotate(pivot: Pos, radius: number) {
@@ -60,13 +64,28 @@ export class GameMap extends Container {
 		}
 	}
 
+	removeTarget(pos: Pos) {
+		const target = this.targets.children.find(
+			(target) =>
+				target.pos.col === pos.col && target.pos.row === pos.row,
+		);
+		if (target) {
+			this.targets.removeChild(target);
+		}
+	}
+
 	addTarget(pos: Pos) {
-		const path = findBestPath(this.map, this.player.pos, pos);
+		const path = findBestPath(
+			this.map,
+			this.player.lastStep() || this.player.pos,
+			pos,
+		);
 		if (!path) {
 			return;
 		}
 		for (const step of path) {
 			this.player.nextSteps.push(step);
+			this.targets.addChild(new Target({ gameMap: this, pos: step }));
 		}
 	}
 }

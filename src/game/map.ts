@@ -133,7 +133,7 @@ export const findBestPath = (map: Map, from: Pos, to: Pos) => {
 				setDistance(otherPos, newDistance, [...path, otherPos]);
 			}
 			if (
-				!visited.some(
+				![...visited, ...toVisitNext].some(
 					(p) => p.col == otherPos.col && p.row == otherPos.row,
 				)
 			) {
