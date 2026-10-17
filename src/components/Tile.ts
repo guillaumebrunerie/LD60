@@ -91,7 +91,7 @@ export class Tile extends Container {
 		this.animate(
 			this,
 			{ ...xy, angle: this.angle + angle },
-			{ duration: 1 },
+			{ duration: 0.5 },
 		);
 		this.pos = pos;
 	}

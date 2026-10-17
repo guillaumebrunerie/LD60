@@ -11,6 +11,7 @@ import {
 } from "../game/map";
 import { Player } from "./Player";
 import { Target } from "./Target";
+import { Snake } from "./Snake";
 
 type TilesOptions = ContainerOptions & {
 	// setPlayerTarget: (i: number, j: number) => void;
@@ -36,6 +37,7 @@ export class GameMap extends Container {
 	tiles: Tile[] = [];
 	player: Player;
 	targets: Container<Target>;
+	snake: Snake;
 
 	constructor(options: GameMapOptions) {
 		super(options);
@@ -54,6 +56,8 @@ export class GameMap extends Container {
 		this.player = tiles.addChild(
 			new Player({ gameMap: this, pos: { col: 0, row: 0 } }),
 		);
+
+		this.snake = tiles.addChild(new Snake({ gameMap: this }));
 
 		window.addEventListener("keydown", (event) => {
 			if (event.code == "Space") {
@@ -102,6 +106,7 @@ export class GameMap extends Container {
 		for (const step of path) {
 			this.player.nextSteps.push(step);
 			this.targets.addChild(new Target({ gameMap: this, pos: step }));
+			this.snake.nextSteps.push(step);
 		}
 	}
 }

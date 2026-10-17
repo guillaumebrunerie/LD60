@@ -28,6 +28,7 @@ export class Target extends Container {
 				texture: Assets.get(`MapTile_Select.png`),
 				anchor: 0.5,
 				blendMode: "add",
+				alpha: 0,
 			}),
 		);
 	}
