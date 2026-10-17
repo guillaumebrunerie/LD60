@@ -11,6 +11,7 @@ import { calculatePos, findBestPath, type Pos } from "../game/map";
 import type { GameMap } from "./GameMap";
 import { BASE_RADIUS, RADIUS } from "../configuration";
 import { mod } from "../utils/maths";
+import type { Apple } from "./Apple";
 
 type SnakeOptions = ContainerOptions & {
 	gameMap: GameMap;
@@ -116,12 +117,12 @@ export class Snake extends Container {
 		this.timer -= ticker.deltaMS;
 	}
 
-	pickTarget(apples: Pos[]) {
+	pickTarget(apples: Container<Apple>) {
 		const pathAndDistance = findBestPath(
 			this.gameMap.map,
 			this.gameMap.snake.parts.children.map((part) => part.pos),
 			this.parts.children[0].pos,
-			apples,
+			apples.children.map((apple) => apple.pos),
 		);
 		if (!pathAndDistance) {
 			return;

@@ -77,7 +77,7 @@ export class GameMap extends Container {
 
 		this.snake = tiles.addChild(new Snake({ gameMap: this }));
 
-		this.snake.pickTarget(this.apples.children.map((apple) => apple.pos));
+		this.snake.pickTarget(this.apples);
 
 		window.addEventListener("keydown", (event) => {
 			if (event.code == "Space") {
@@ -108,6 +108,8 @@ export class GameMap extends Container {
 		this.map.tiles = this.map.tiles.map(
 			(t) => replacements.find(([a]) => a == t)?.[1] || t,
 		);
+		this.snake.nextSteps = [];
+		this.snake.pickTarget(this.apples);
 	}
 
 	maybeEatApple(pos: Pos) {
@@ -117,9 +119,7 @@ export class GameMap extends Container {
 		if (apple) {
 			apple.destroy();
 			apple.removeFromParent();
-			this.snake.pickTarget(
-				this.apples.children.map((apple) => apple.pos),
-			);
+			this.snake.pickTarget(this.apples);
 
 			const newApple = addApple(this.map);
 			if (newApple) {
