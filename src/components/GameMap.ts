@@ -16,7 +16,8 @@ import { Snake } from "./Snake";
 import { Apple } from "./Apple";
 import { randomInt } from "../utils/random";
 import { CRTFilter } from "pixi-filters";
-import { CRT_CONFIGURATION } from "../configuration";
+import { CRT_CONFIGURATION, HEIGHT, WIDTH } from "../configuration";
+import { RotateButton } from "./RotateButton";
 
 type TilesOptions = ContainerOptions & {
 	// setPlayerTarget: (i: number, j: number) => void;
@@ -44,6 +45,8 @@ export class GameMap extends Container {
 	targets: Container<Target>;
 	apples: Container<Apple>;
 	snake: Snake;
+	rotateLeft: RotateButton;
+	rotateRight: RotateButton;
 
 	constructor(options: GameMapOptions) {
 		super(options);
@@ -62,7 +65,13 @@ export class GameMap extends Container {
 		this.targets = tiles.addChild(new Container<Target>());
 
 		this.player = tiles.addChild(
-			new Player({ gameMap: this, pos: { col: 0, row: 0 } }),
+			new Player({
+				gameMap: this,
+				pos: {
+					col: Math.round(WIDTH / 2),
+					row: Math.round(HEIGHT / 2),
+				},
+			}),
 		);
 
 		this.apples = tiles.addChild(new Container<Apple>());
@@ -74,10 +83,25 @@ export class GameMap extends Container {
 				}),
 			);
 		}
-
 		this.snake = tiles.addChild(new Snake({ gameMap: this }));
-
 		this.snake.pickTarget(this.apples);
+		this.rotateLeft = this.addChild(
+			new RotateButton({
+				x: 750,
+				y: 1450,
+				gameMap: this,
+				steps: 1,
+			}),
+		);
+		this.rotateRight = this.addChild(
+			new RotateButton({
+				x: 150,
+				y: 1450,
+				gameMap: this,
+				scale: { x: -1, y: 1 },
+				steps: -1,
+			}),
+		);
 
 		window.addEventListener("keydown", (event) => {
 			if (event.code == "Space") {
@@ -93,7 +117,10 @@ export class GameMap extends Container {
 	}
 
 	rotate(pivot: Pos, radius: number, steps: number) {
-		const replacements = [];
+		const replacements: [
+			{ pos: Pos; elevation: number },
+			{ pos: Pos; elevation: number },
+		][] = [];
 		for (const tile of this.tiles) {
 			if (hexDistance(tile.pos, pivot) <= radius) {
 				const oldPos = { ...tile.pos };
@@ -101,7 +128,7 @@ export class GameMap extends Container {
 				tile.move({ ...newPos }, 60 * steps);
 				const oldT = this.map.tiles.find(
 					(t) => t.pos.col == oldPos.col && t.pos.row == oldPos.row,
-				);
+				)!;
 				replacements.push([oldT, { ...oldT, pos: { ...newPos } }]);
 			}
 		}
@@ -114,6 +141,9 @@ export class GameMap extends Container {
 		this.map.tiles = this.map.tiles.map(
 			(t) => replacements.find(([a]) => a == t)?.[1] || t,
 		);
+		for (const [, newT] of replacements) {
+			this.map.array[newT.pos.col][newT.pos.row] = newT.elevation;
+		}
 		this.snake.nextSteps = [];
 		this.snake.pickTarget(this.apples);
 	}

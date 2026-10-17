@@ -9,7 +9,7 @@ import {
 import { Container } from "../PausableContainer";
 import { calculatePos, findBestPath, type Pos } from "../game/map";
 import type { GameMap } from "./GameMap";
-import { BASE_RADIUS, RADIUS } from "../configuration";
+import { BASE_RADIUS, HEIGHT, RADIUS, WIDTH } from "../configuration";
 import { mod } from "../utils/maths";
 import type { Apple } from "./Apple";
 
@@ -21,9 +21,9 @@ export class Snake extends Container {
 	gameMap: GameMap;
 	parts: Container<SnakePart>;
 	positions: Pos[] = [
-		{ col: 0, row: 0 },
-		{ col: 1, row: 0 },
-		{ col: 2, row: 0 },
+		{ col: WIDTH - 2, row: Math.round(HEIGHT / 2) },
+		{ col: WIDTH - 1, row: Math.round(HEIGHT / 2) },
+		{ col: WIDTH, row: Math.round(HEIGHT / 2) },
 	];
 	nextSteps: Pos[] = [];
 	timer = 0;
