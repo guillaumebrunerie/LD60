@@ -42,6 +42,9 @@ export const createMap = (): Map => {
 			} else {
 				elevation = 4;
 			}
+			if (col == 0 || col == WIDTH - 1 || row == 0 || row == HEIGHT - 1) {
+				elevation = 4;
+			}
 
 			tiles.push({ pos, elevation });
 			array[col][row] = elevation;

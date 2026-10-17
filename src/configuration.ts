@@ -3,8 +3,8 @@ import type { CRTFilterOptions } from "pixi-filters";
 export const BASE_RADIUS = 50;
 export const RADIUS = 20;
 
-export const WIDTH = Math.ceil(900 / RADIUS / Math.sqrt(3)) + 1;
-export const HEIGHT = Math.ceil(1600 / RADIUS / 1.5) * 0.8;
+export const WIDTH = Math.ceil(900 / RADIUS / Math.sqrt(3));
+export const HEIGHT = Math.ceil((1600 / RADIUS / 1.5) * 0.8);
 
 export const ELEVATION_SCALE = 12;
 export const SPEED = 300;
