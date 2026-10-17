@@ -49,11 +49,11 @@ export class GameMap extends Container {
 			);
 		}
 
+		this.targets = tiles.addChild(new Container<Target>());
+
 		this.player = tiles.addChild(
 			new Player({ gameMap: this, pos: { col: 0, row: 0 } }),
 		);
-
-		this.targets = tiles.addChild(new Container<Target>());
 	}
 
 	rotate(pivot: Pos, radius: number) {

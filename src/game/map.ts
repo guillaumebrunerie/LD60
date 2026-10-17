@@ -14,7 +14,23 @@ export const createMap = (): Map => {
 		for (let row = -30; row <= 30; row++) {
 			const pos = { col, row };
 			const xy = calculatePos(pos, RADIUS);
-			const elevation = noise.sample({ x: xy.x / 300, y: xy.y / 300 });
+			const data = noise.sample({ x: xy.x / 500, y: xy.y / 500 });
+
+			let elevation;
+			if (data < -0.3) {
+				elevation = -1;
+			} else if (data < -0.15) {
+				elevation = 0;
+			} else if (data < 0.15) {
+				elevation = 1;
+			} else if (data < 0.25) {
+				elevation = 2;
+			} else if (data < 0.35) {
+				elevation = 3;
+			} else {
+				elevation = 4;
+			}
+
 			map.push({ pos, elevation });
 		}
 	}
@@ -123,7 +139,7 @@ export const findBestPath = (map: Map, from: Pos, to: Pos) => {
 			const elevation = map.find(
 				({ pos: p }) => p.col == otherPos.col && p.row == otherPos.row,
 			)?.elevation;
-			if (elevation == undefined || elevation < -0.3 || elevation > 0.1) {
+			if (elevation == undefined || elevation < 0 || elevation > 1) {
 				continue;
 			}
 

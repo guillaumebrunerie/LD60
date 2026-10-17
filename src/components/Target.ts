@@ -25,7 +25,7 @@ export class Target extends Container {
 
 		this.addChild(
 			new Sprite({
-				texture: Assets.get(`MapTile_Grass_01.png`),
+				texture: Assets.get(`MapTile_Select.png`),
 				anchor: 0.5,
 				blendMode: "add",
 			}),

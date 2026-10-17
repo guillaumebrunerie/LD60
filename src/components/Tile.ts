@@ -43,18 +43,24 @@ export class Tile extends Container {
 
 		const alpha = 1;
 		let ids;
-		if (this.elevation < -0.3) {
-			ids = ["Blocker_Water_01"];
-		} else if (this.elevation < 0) {
-			ids = ["Grass_01", "Grass_02", "Grass_03"];
-		} else if (this.elevation < 0.1) {
-			ids = ["Ground_01", "Ground_02", "Ground_03"];
-		} else if (this.elevation < 0.2) {
-			ids = ["Mountain_Low_01"];
-		} else if (this.elevation < 0.3) {
-			ids = ["Mountain_Medium_01"];
-		} else {
-			ids = ["Mountain_High_01"];
+		switch (this.elevation) {
+			case -1:
+				ids = ["Blocker_Water_01"];
+				break;
+			case 0:
+				ids = ["Grass_01", "Grass_02", "Grass_03"];
+				break;
+			case 1:
+				ids = ["Ground_01", "Ground_02", "Ground_03"];
+				break;
+			case 2:
+				ids = ["Mountain_Low_01"];
+				break;
+			case 3:
+				ids = ["Mountain_Medium_01"];
+				break;
+			case 4:
+				ids = ["Mountain_High_01"];
 		}
 		const id = randomItem(ids);
 
