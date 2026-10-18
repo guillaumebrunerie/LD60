@@ -23,6 +23,7 @@ import {
 	ENV_RATE,
 	ENV_SPEED,
 	HEIGHT,
+	RADIUS,
 	WIDTH,
 } from "../configuration";
 import { RotateButton } from "./RotateButton";
@@ -53,88 +54,20 @@ export class GameMap extends Container {
 	map: Map;
 	tiles: Tile[] = [];
 	player: Player;
-	targets: Container<Target>;
-	apples: Container<Apple>;
-	notes: Container<Note>;
-	enemies: Container<Enemy>;
-	snake: Snake;
+	targets: Container<Target> = new Container<Target>();
+	apples: Container<Apple> = new Container<Apple>();
+	notes: Container<Note> = new Container<Note>();
+	enemies: Container<Enemy> = new Container<Enemy>();
+	snake: Snake = new Snake({});
 	// rotateLeft: RotateButton;
 	// rotateRight: RotateButton;
 
 	constructor(options: GameMapOptions) {
 		super(options);
 
+		this.startGame();
+
 		// this.filters = [new CRTFilter(CRT_CONFIGURATION)];
-
-		const tiles = this.addChild(new Tiles({ x: 0, y: 0 }));
-		this.map = createMap();
-
-		for (const { pos, elevation } of this.map.tiles) {
-			this.tiles.push(
-				tiles.addChild(new Tile({ gameMap: this, pos, elevation })),
-			);
-		}
-
-		this.targets = tiles.addChild(new Container<Target>());
-
-		this.player = tiles.addChild(
-			new Player({
-				gameMap: this,
-				pos: {
-					col: Math.round(WIDTH / 2),
-					row: Math.round(HEIGHT / 2),
-				},
-			}),
-		);
-
-		this.enemies = tiles.addChild(new Container<Enemy>());
-		// for (const pos of this.map.apples) {
-		// 	this.enemies.addChild(
-		// 		new Enemy({
-		// 			gameMap: this,
-		// 			pos,
-		// 		}),
-		// 	);
-		// }
-
-		this.notes = tiles.addChild(new Container<Note>());
-		for (const pos of this.map.notes) {
-			this.notes.addChild(
-				new Note({
-					gameMap: this,
-					pos,
-				}),
-			);
-		}
-
-		this.apples = tiles.addChild(new Container<Apple>());
-		for (const pos of this.map.apples) {
-			this.apples.addChild(
-				new Apple({
-					gameMap: this,
-					pos,
-				}),
-			);
-		}
-		this.snake = tiles.addChild(new Snake({ gameMap: this }));
-		// this.snake.pickTarget(this.apples);
-		// this.rotateLeft = this.addChild(
-		// 	new RotateButton({
-		// 		x: 750,
-		// 		y: 1450,
-		// 		gameMap: this,
-		// 		steps: 1,
-		// 	}),
-		// );
-		// this.rotateRight = this.addChild(
-		// 	new RotateButton({
-		// 		x: 150,
-		// 		y: 1450,
-		// 		gameMap: this,
-		// 		scale: { x: -1, y: 1 },
-		// 		steps: -1,
-		// 	}),
-		// );
 
 		window.addEventListener("keydown", (event) => {
 			if (event.code == "Space") {
@@ -191,6 +124,103 @@ export class GameMap extends Container {
 		});
 	}
 
+	tt: Tiles;
+	startGame() {
+		this.evolveTimer = 0;
+		this.dx = 0;
+
+		const left = (RADIUS * Math.sqrt(3)) / 2;
+		const width = WIDTH * RADIUS * Math.sqrt(3);
+		const top = (RADIUS * 1.5) / 2;
+		const height = HEIGHT * RADIUS * 1.5;
+		const tiles = (this.tt = this.addChild(
+			new Tiles({
+				x: 0, //(900 - width) / 2 + left,
+				y: (1600 - height) / 2 + top,
+			}),
+		));
+		this.map = createMap();
+
+		this.tiles.forEach((tile) => tile.destroy());
+		for (const { pos, elevation } of this.map.tiles) {
+			this.tiles.push(
+				tiles.addChild(new Tile({ gameMap: this, pos, elevation })),
+			);
+		}
+
+		this.targets.destroy();
+		this.targets = tiles.addChild(new Container<Target>());
+
+		this.player?.destroy();
+		this.player = tiles.addChild(
+			new Player({
+				gameMap: this,
+				pos: {
+					col: Math.round(WIDTH / 2),
+					row: Math.round(HEIGHT / 2),
+				},
+			}),
+		);
+
+		this.enemies.destroy();
+		this.enemies = tiles.addChild(new Container<Enemy>());
+		// for (const pos of this.map.apples) {
+		// 	this.enemies.addChild(
+		// 		new Enemy({
+		// 			gameMap: this,
+		// 			pos,
+		// 		}),
+		// 	);
+		// }
+
+		this.notes.destroy();
+		this.notes = tiles.addChild(new Container<Note>());
+		for (const pos of this.map.notes) {
+			this.notes.addChild(
+				new Note({
+					gameMap: this,
+					pos,
+				}),
+			);
+		}
+
+		this.apples.destroy();
+		this.apples = tiles.addChild(new Container<Apple>());
+		for (const pos of this.map.apples) {
+			this.apples.addChild(
+				new Apple({
+					gameMap: this,
+					pos,
+				}),
+			);
+		}
+
+		this.snake.destroy();
+		this.snake = tiles.addChild(new Snake({ gameMap: this }));
+		// this.snake.pickTarget(this.apples);
+		// this.rotateLeft = this.addChild(
+		// 	new RotateButton({
+		// 		x: 750,
+		// 		y: 1450,
+		// 		gameMap: this,
+		// 		steps: 1,
+		// 	}),
+		// );
+		// this.rotateRight = this.addChild(
+		// 	new RotateButton({
+		// 		x: 150,
+		// 		y: 1450,
+		// 		gameMap: this,
+		// 		scale: { x: -1, y: 1 },
+		// 		steps: -1,
+		// 	}),
+		// );
+	}
+
+	gameOver() {
+		this.startGame();
+	}
+
 	evolveTimer = 0;
 
 	dx = 0;
@@ -218,11 +248,13 @@ export class GameMap extends Container {
 		// 	(ticker.deltaMS / 1000) * CRT_CONFIGURATION.speed;
 
 		if (this.evolveTimer < 0) {
-			this.dx += ENV_SPEED / ENV_RATE;
+			// this.dx += ENV_SPEED / ENV_RATE;
 			this.evolve();
 			this.evolveTimer = 1000 / ENV_RATE;
 		}
 		this.evolveTimer -= ticker.deltaMS;
+		this.tt.x -=
+			((ENV_SPEED * ticker.deltaMS) / 1000) * RADIUS * Math.sqrt(3);
 	}
 
 	moveInProgress = false;

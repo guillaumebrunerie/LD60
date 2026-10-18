@@ -25,7 +25,7 @@ export const calculateElevation = (noise: PerlinNoise, pos: Pos) => {
 	}
 
 	if (Math.abs(xy.x - RADIUS * 100) < RADIUS * 5) {
-		data *= 3 * (2 - Math.abs(xy.x - RADIUS * 100) / (RADIUS * 5));
+		data *= 2 - Math.abs(xy.x - RADIUS * 100) / (RADIUS * 5);
 	}
 
 	let elevation;

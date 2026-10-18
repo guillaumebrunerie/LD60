@@ -274,7 +274,32 @@ export class Snake extends Container {
 	}
 
 	isGrowing = false;
+	isWarned = false;
 	moveTo(newPos: Pos) {
+		const isFreeAt = ({ col, row }: Pos) => {
+			const elevation = this.gameMap.map.array[col]?.[row];
+			if (elevation === undefined || elevation < 0 || elevation > 1) {
+				return false;
+			}
+			if (
+				this.parts.children.some(
+					(part) => part.pos.col == col && part.pos.row == row,
+				)
+			) {
+				return false;
+			}
+			return true;
+		};
+		if (!isFreeAt(newPos)) {
+			if (this.isWarned) {
+				// this.gameMap.gameOver();
+			} else {
+				this.isWarned = true;
+			}
+			return;
+		}
+		this.isWarned = false;
+
 		const head = this.parts.children[0];
 		const afterHead = this.parts.children[1];
 		const beforeTail2 = this.parts.children.at(-3)!;
