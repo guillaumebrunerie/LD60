@@ -43,7 +43,7 @@ export class Tile extends Container {
 
 		this.onpointerdown = () => {
 			this.gameMap.clearTargets();
-			this.gameMap.addTarget(this.pos);
+			// this.gameMap.addTarget(this.pos);
 		};
 	}
 

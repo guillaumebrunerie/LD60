@@ -27,12 +27,12 @@ export const calculateElevation = (noise: PerlinNoise, pos: Pos) => {
 		elevation = -1;
 	} else if (data < -0.15) {
 		elevation = 0;
-	} else if (data < 0.1) {
+	} else if (data < 0.5) {
 		// Mountains
 		elevation = 1;
-	} else if (data < 0.3) {
+	} else if (data < 0.6) {
 		elevation = 2;
-	} else if (data < 0.35) {
+	} else if (data < 0.65) {
 		elevation = 3;
 	} else {
 		elevation = 4;

@@ -104,6 +104,12 @@ export class Snake extends Container {
 		});
 	}
 
+	changeDirection(newDirection: Direction) {
+		if (this.direction != oppositeDirection(newDirection)) {
+			this.direction = newDirection;
+		}
+	}
+
 	pushAway() {
 		const isFreeAt = ({ col, row }: Pos) => {
 			const elevation = this.gameMap.map.array[col]?.[row];

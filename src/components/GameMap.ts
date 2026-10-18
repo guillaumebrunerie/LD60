@@ -1,4 +1,4 @@
-import { Ticker, type ContainerOptions } from "pixi.js";
+import { Point, Ticker, type ContainerOptions } from "pixi.js";
 import { Container } from "../PausableContainer";
 import { Tile } from "./Tile";
 import {
@@ -10,6 +10,7 @@ import {
 	rotate,
 	type Map,
 	type Pos,
+	type XYPoint,
 } from "../game/map";
 import { Player } from "./Player";
 import { Target } from "./Target";
@@ -21,6 +22,7 @@ import { CRT_CONFIGURATION, HEIGHT, WIDTH } from "../configuration";
 import { RotateButton } from "./RotateButton";
 import { Enemy } from "./Enemy";
 import { Note } from "./Note";
+import { getDistance, length, mod } from "../utils/maths";
 
 type TilesOptions = ContainerOptions & {
 	// setPlayerTarget: (i: number, j: number) => void;
@@ -131,6 +133,54 @@ export class GameMap extends Container {
 		window.addEventListener("keydown", (event) => {
 			if (event.code == "Space") {
 				// this.rotate(this.player.pos, 3, event.shiftKey ? -1 : 1);
+			}
+		});
+
+		let downPosition: XYPoint | undefined = undefined;
+		const threshold = 50;
+		window.addEventListener("pointerdown", (event) => {
+			downPosition = { x: event.clientX, y: event.clientY };
+		});
+		window.addEventListener("pointerup", () => {
+			downPosition = undefined;
+		});
+		window.addEventListener("pointermove", (event) => {
+			if (
+				downPosition &&
+				length({
+					x: downPosition.x - event.clientX,
+					y: downPosition.y - event.clientY,
+				}) >= threshold
+			) {
+				const angle = Math.atan2(
+					event.clientY - downPosition.y,
+					event.clientX - downPosition.x,
+				);
+				const steps = Math.round(
+					mod((angle * 180) / Math.PI, 360) / 60,
+				);
+				downPosition = { x: event.clientX, y: event.clientY };
+				switch (steps) {
+					case 0:
+					case 6:
+						this.snake.changeDirection("right");
+						break;
+					case 1:
+						this.snake.changeDirection("right-down");
+						break;
+					case 2:
+						this.snake.changeDirection("left-down");
+						break;
+					case 3:
+						this.snake.changeDirection("left");
+						break;
+					case 4:
+						this.snake.changeDirection("left-up");
+						break;
+					case 5:
+						this.snake.changeDirection("right-up");
+						break;
+				}
 			}
 		});
 	}
