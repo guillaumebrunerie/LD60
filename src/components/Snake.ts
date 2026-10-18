@@ -41,6 +41,7 @@ export class Snake extends Container {
 	nextSteps: Pos[] = [];
 	timer = 0;
 	direction: Direction = "right";
+	isRunning = false;
 
 	constructor(options: SnakeOptions) {
 		super({
@@ -50,9 +51,9 @@ export class Snake extends Container {
 		this.gameMap = options.gameMap;
 		const row = options.level.size;
 		this.positions = [
+			{ col: 3, row },
 			{ col: 2, row },
 			{ col: 1, row },
-			{ col: 0, row },
 		];
 
 		this.parts = this.addChild(new Container<SnakePart>());
@@ -69,6 +70,13 @@ export class Snake extends Container {
 		});
 
 		window.addEventListener("keydown", (event) => {
+			if (
+				["ArrowLeft", "ArrowUp", "ArrowRight", "ArrowDown"].includes(
+					event.code,
+				)
+			) {
+				this.isRunning = true;
+			}
 			switch (`${event.code}/${this.direction}`) {
 				case "ArrowLeft/left-up":
 				case "ArrowLeft/left-down":
@@ -111,6 +119,7 @@ export class Snake extends Container {
 	}
 
 	changeDirection(newDirection: Direction) {
+		this.isRunning = true;
 		if (this.direction != oppositeDirection(newDirection)) {
 			this.direction = newDirection;
 		}
@@ -254,6 +263,9 @@ export class Snake extends Container {
 	}
 
 	update(ticker: Ticker) {
+		if (!this.isRunning) {
+			return;
+		}
 		// if (this.timer <= 0 && this.nextSteps.length > 0) {
 		// 	this.moveTo(this.nextSteps.shift()!);
 		// 	this.nextSteps = [];
