@@ -93,8 +93,8 @@ export const pickAvailablePosition = (map: Map, minCol: number) => {
 			col: randomInt(minCol, minCol + 20),
 			row: randomInt(0, HEIGHT - 1),
 		};
-		const elevation = map.array[pos.col][pos.row];
-		if (elevation < 0 || elevation > 1) {
+		const elevation = map.array[pos.col]?.[pos.row];
+		if (elevation === undefined || elevation < 0 || elevation > 1) {
 			continue;
 		}
 		return pos;

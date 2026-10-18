@@ -4,6 +4,7 @@ import { Tile } from "./Tile";
 import {
 	addApple,
 	calculateElevation,
+	calculatePos,
 	createMap,
 	findBestPath,
 	hexDistance,
@@ -255,6 +256,35 @@ export class GameMap extends Container {
 		this.evolveTimer -= ticker.deltaMS;
 		this.tt.x -=
 			((ENV_SPEED * ticker.deltaMS) / 1000) * RADIUS * Math.sqrt(3);
+
+		for (const apple of this.apples.children) {
+			if (apple.pos.col < this.snake.headPos().col - 30) {
+				apple.destroy();
+				apple.removeFromParent();
+				this.snake.pickTarget(this.apples);
+
+				const newApple = addApple(
+					this.map,
+					this.snake.headPos().col + 20,
+				);
+				if (newApple) {
+					this.apples.addChild(
+						new Apple({
+							gameMap: this,
+							pos: newApple,
+						}),
+					);
+				}
+			}
+		}
+
+		const leftThreshold = -50;
+		if (
+			calculatePos(this.snake.headPos(), RADIUS).x + this.tt.x <
+			leftThreshold
+		) {
+			this.gameOver();
+		}
 	}
 
 	moveInProgress = false;
