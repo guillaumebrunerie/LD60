@@ -20,14 +20,14 @@ export const calculateElevation = (noise: PerlinNoise, pos: Pos) => {
 		x: xy.x / RADIUS / ELEVATION_SCALE,
 		y: xy.y / RADIUS / ELEVATION_SCALE,
 	});
-	if (xy.x < RADIUS * 10) {
-		data *= Math.pow(xy.x / (RADIUS * 10), 2);
+	if (xy.x < RADIUS * 15) {
+		data *= Math.pow(xy.x / (RADIUS * 15), 2);
 	}
 
 	// if (Math.abs(xy.x - RADIUS * 100) < RADIUS * 5) {
 	// 	data *= 2 - Math.abs(xy.x - RADIUS * 100) / (RADIUS * 5);
 	// }
-	// data *= 2;
+	// data *= 0.2;
 
 	let elevation;
 	if (data < -0.35) {

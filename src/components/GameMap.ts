@@ -331,8 +331,8 @@ export class GameMap extends Container {
 			vh < desiredDistance ?
 				{ ...dest }
 			:	{
-					x: this.tt.x + (v.x / vh) * desiredDistance,
-					y: this.tt.y + (v.y / vh) * desiredDistance,
+					x: this.dest.x + (v.x / vh) * desiredDistance,
+					y: this.dest.y + (v.y / vh) * desiredDistance,
 				};
 		this.tt.x = clamp(
 			this.dest.x,
