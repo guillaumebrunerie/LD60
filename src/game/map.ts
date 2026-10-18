@@ -52,7 +52,7 @@ export const calculateElevation = (noise: PerlinNoise, pos: Pos) => {
 		pos.row == 0 ||
 		pos.row == HEIGHT - 1
 	) {
-		elevation = 4;
+		elevation = 5;
 	}
 	return elevation;
 };

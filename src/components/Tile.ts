@@ -55,10 +55,18 @@ export class Tile extends Container {
 		let ids: string[] = [];
 		switch (this.elevation) {
 			case -1:
-				ids = ["Blocker_Water_01"];
+				ids = [
+					"Blocker_Water_01",
+					"Blocker_Water_02",
+					"Blocker_Water_03",
+				];
 				break;
 			case 0:
-				ids = ["Blocker_Border_01"];
+				ids = [
+					"Blocker_Border_01",
+					"Blocker_Border_02",
+					"Blocker_Border_03",
+				];
 				break;
 			case 0.5:
 				ids = ["Ground_01", "Ground_02", "Ground_03"];
@@ -74,6 +82,10 @@ export class Tile extends Container {
 				break;
 			case 4:
 				ids = ["Mountain_High_01"];
+				break;
+			case 5:
+				ids = ["Frame_01"];
+				break;
 		}
 		const id = randomItem(ids);
 
