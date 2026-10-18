@@ -1,0 +1,5 @@
+- Do not snip tail
+- Queue moves
+- All other screens
+- Score
+- Make it loop

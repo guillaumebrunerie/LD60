@@ -149,7 +149,14 @@ export class Snake extends Container {
 			}
 
 			const candidates = (
-				["left", "left-up", "left-down"] as const
+				[
+					"left",
+					"left-up",
+					"left-down",
+					"right-up",
+					"right-down",
+					"right",
+				] as const
 			).flatMap((direction) => {
 				const newPos = applyDirection(part.pos, direction);
 				if (isPosAcceptable(newPos)) {

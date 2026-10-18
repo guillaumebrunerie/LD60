@@ -306,7 +306,7 @@ export class GameMap extends Container {
 			apple.removeFromParent();
 			this.snake.pickTarget(this.apples);
 
-			const newApple = addApple(this.map);
+			const newApple = addApple(this.map, this.snake.headPos().col);
 			if (newApple) {
 				this.apples.addChild(
 					new Apple({
