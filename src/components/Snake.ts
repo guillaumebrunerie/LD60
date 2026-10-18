@@ -27,19 +27,17 @@ import {
 import { mod } from "../utils/maths";
 import type { Apple } from "./Apple";
 import { randomItem } from "../utils/random";
+import type { Level } from "../game/levels";
 
 type SnakeOptions = ContainerOptions & {
 	gameMap: GameMap;
+	level: Level;
 };
 
 export class Snake extends Container {
 	gameMap: GameMap;
 	parts: Container<SnakePart>;
-	positions: Pos[] = [
-		{ col: 2, row: Math.round(HEIGHT / 2) },
-		{ col: 1, row: Math.round(HEIGHT / 2) },
-		{ col: 0, row: Math.round(HEIGHT / 2) },
-	];
+	positions: Pos[] = [];
 	nextSteps: Pos[] = [];
 	timer = 0;
 	direction: Direction = "right";
@@ -50,6 +48,12 @@ export class Snake extends Container {
 			eventMode: "none",
 		});
 		this.gameMap = options.gameMap;
+		const row = options.level.size;
+		this.positions = [
+			{ col: 2, row },
+			{ col: 1, row },
+			{ col: 0, row },
+		];
 
 		this.parts = this.addChild(new Container<SnakePart>());
 		this.positions.forEach((pos, i) => {
@@ -303,11 +307,11 @@ export class Snake extends Container {
 			return true;
 		};
 		if (!isFreeAt(newPos)) {
-			if (this.isWarned) {
-				// this.gameMap.gameOver();
-			} else {
-				this.isWarned = true;
-			}
+			// if (this.isWarned) {
+			this.gameMap.gameOver();
+			// } else {
+			// 	this.isWarned = true;
+			// }
 			return;
 		}
 		this.isWarned = false;

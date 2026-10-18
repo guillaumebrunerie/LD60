@@ -22,12 +22,20 @@ export class PerlinNoise {
 	height: number;
 	vectors: number[][];
 
-	constructor({ width, height }: { width: number; height: number }) {
+	constructor({
+		width,
+		height,
+		seed,
+	}: {
+		width: number;
+		height: number;
+		seed?: string;
+	}) {
 		this.width = width;
 		this.height = height;
 
 		this.vectors = [];
-		const random = Math.random; //randomSeeded("abc");
+		const random = seed ? randomSeeded(seed) : Math.random;
 		for (let x = 0; x < width; x++) {
 			const col = [];
 			for (let y = 0; y < height; y++) {

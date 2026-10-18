@@ -32,6 +32,7 @@ import { RotateButton } from "./RotateButton";
 import { Enemy } from "./Enemy";
 import { Note } from "./Note";
 import { clamp, getDistance, length, mod } from "../utils/maths";
+import { level1 } from "../game/levels";
 // import { Viewport } from "pixi-viewport";
 // import { app } from "../getEngine";
 
@@ -62,7 +63,7 @@ export class GameMap extends Container {
 	apples: Container<Apple> = new Container<Apple>();
 	notes: Container<Note> = new Container<Note>();
 	enemies: Container<Enemy> = new Container<Enemy>();
-	snake: Snake = new Snake({});
+	snake: Snake;
 	// rotateLeft: RotateButton;
 	// rotateRight: RotateButton;
 
@@ -145,7 +146,7 @@ export class GameMap extends Container {
 		// );
 
 		const tiles = (this.tt = this.addChild(new Tiles({})));
-		this.map = createMap();
+		this.map = createMap(level1);
 
 		this.tiles.forEach((tile) => tile.destroy());
 		for (const { pos, elevation } of this.map.tiles) {
@@ -158,15 +159,15 @@ export class GameMap extends Container {
 		this.targets = tiles.addChild(new Container<Target>());
 
 		this.player?.destroy();
-		this.player = tiles.addChild(
-			new Player({
-				gameMap: this,
-				pos: {
-					col: Math.round(WIDTH / 2),
-					row: Math.round(HEIGHT / 2),
-				},
-			}),
-		);
+		// this.player = tiles.addChild(
+		// 	new Player({
+		// 		gameMap: this,
+		// 		pos: {
+		// 			col: Math.round(WIDTH / 2),
+		// 			row: Math.round(HEIGHT / 2),
+		// 		},
+		// 	}),
+		// );
 
 		this.enemies.destroy();
 		this.enemies = tiles.addChild(new Container<Enemy>());
@@ -201,8 +202,10 @@ export class GameMap extends Container {
 			);
 		}
 
-		this.snake.destroy();
-		this.snake = tiles.addChild(new Snake({ gameMap: this }));
+		this.snake?.destroy();
+		this.snake = tiles.addChild(
+			new Snake({ gameMap: this, level: level1 }),
+		);
 		// this.snake.pickTarget(this.apples);
 		// this.rotateLeft = this.addChild(
 		// 	new RotateButton({
@@ -225,12 +228,12 @@ export class GameMap extends Container {
 		const dest = {
 			x: clamp(
 				-this.snake.parts.children[0].x,
-				450 - RADIUS * (WIDTH - 1) * Math.sqrt(3),
+				450 - RADIUS * 2 * level1.size * Math.sqrt(3),
 				-450,
 			),
 			y: clamp(
 				-this.snake.parts.children[0].y,
-				800 - RADIUS * (HEIGHT - 1) * 1.5,
+				800 - RADIUS * 2 * level1.size * 1.5,
 				-800,
 			),
 		};
@@ -294,7 +297,7 @@ export class GameMap extends Container {
 				apple.removeFromParent();
 				this.snake.pickTarget(this.apples);
 
-				const newApple = addApple(this.map);
+				const newApple = addApple(this.map, level1.size);
 				if (newApple) {
 					this.apples.addChild(
 						new Apple({
@@ -314,7 +317,6 @@ export class GameMap extends Container {
 		// 	this.gameOver();
 		// }
 
-		console.log(this.tt.x, this.snake.parts.children[0].x);
 		const dest = {
 			x: -this.snake.parts.children[0].x,
 			y: -this.snake.parts.children[0].y,
@@ -336,10 +338,14 @@ export class GameMap extends Container {
 				};
 		this.tt.x = clamp(
 			this.dest.x,
-			450 - RADIUS * (WIDTH - 1) * Math.sqrt(3),
+			450 - RADIUS * 2 * level1.size * Math.sqrt(3),
 			-450,
 		);
-		this.tt.y = clamp(this.dest.y, 800 - RADIUS * (HEIGHT - 1) * 1.5, -800);
+		this.tt.y = clamp(
+			this.dest.y,
+			800 - RADIUS * 2 * level1.size * 1.5,
+			-800,
+		);
 	}
 	dest = { x: 0, y: 0 };
 
