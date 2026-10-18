@@ -169,7 +169,7 @@ export class Snake extends Container {
 		}
 
 		this.parts.children.forEach((part, i) => {
-			part.changeType(
+			part.setType(
 				this.createPart(
 					part.pos,
 					this.parts.children[i - 1]?.pos,
@@ -286,10 +286,10 @@ export class Snake extends Container {
 			new SnakePart(this.createPart(newPos, undefined, head.pos)),
 			0,
 		);
-		head.changeType(this.createPart(head.pos, newPos, afterHead?.pos));
+		head.setType(this.createPart(head.pos, newPos, afterHead?.pos));
 		if (!this.isGrowing) {
 			if (beforeTail2) {
-				beforeTail.changeType(
+				beforeTail.setType(
 					this.createPart(beforeTail.pos, beforeTail2.pos, undefined),
 				);
 			}
@@ -337,18 +337,10 @@ class SnakePart extends Container {
 			scale: RADIUS / BASE_RADIUS,
 			eventMode: "none",
 		});
-		this.changeType(options);
-		// this.pos = options.pos;
-		// this.addChild(
-		// 	new Sprite({
-		// 		anchor: 0.5,
-		// 		texture: getSnakeTexture(options.type),
-		// 		eventMode: "none",
-		// 	}),
-		// );
+		this.setType(options);
 	}
 
-	changeType(options: SnakePartOptions) {
+	setType(options: SnakePartOptions) {
 		this.removeChildren();
 		this.addChild(
 			new Sprite({
