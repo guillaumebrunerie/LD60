@@ -16,10 +16,17 @@ export type Map = {
 
 export const calculateElevation = (noise: PerlinNoise, pos: Pos) => {
 	const xy = calculatePos(pos, RADIUS);
-	const data = noise.sample({
+	let data = noise.sample({
 		x: xy.x / RADIUS / ELEVATION_SCALE,
 		y: xy.y / RADIUS / ELEVATION_SCALE,
 	});
+	if (xy.x < RADIUS * 30) {
+		data *= Math.pow(xy.x / (RADIUS * 30), 2);
+	}
+
+	if (Math.abs(xy.x - RADIUS * 100) < RADIUS * 5) {
+		data *= 3 * (2 - Math.abs(xy.x - RADIUS * 100) / (RADIUS * 5));
+	}
 
 	let elevation;
 	if (data < -0.35) {

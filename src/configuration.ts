@@ -8,8 +8,8 @@ export const HEIGHT = Math.ceil(1600 / RADIUS / 1.5);
 
 export const ELEVATION_SCALE = 9;
 
-export const SNAKE_SPEED = 3;
-export const ENV_SPEED = 1;
+export const SNAKE_SPEED = 5;
+export const ENV_SPEED = 3;
 export const ENV_RATE = 60;
 
 export const SPEED = 300;
