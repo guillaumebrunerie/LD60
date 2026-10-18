@@ -43,9 +43,9 @@ export class Container<
 		for (const control of this.#controls) {
 			control.stop();
 		}
-		requestAnimationFrame(() => {
-			super.destroy(options);
-		});
+		// requestAnimationFrame(() => {
+		super.destroy(options);
+		// });
 	}
 
 	// @ts-expect-error Magic

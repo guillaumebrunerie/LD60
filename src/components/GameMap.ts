@@ -18,7 +18,13 @@ import { Snake } from "./Snake";
 import { Apple } from "./Apple";
 import { randomInt } from "../utils/random";
 import { CRTFilter } from "pixi-filters";
-import { CRT_CONFIGURATION, HEIGHT, WIDTH } from "../configuration";
+import {
+	CRT_CONFIGURATION,
+	ENV_RATE,
+	ENV_SPEED,
+	HEIGHT,
+	WIDTH,
+} from "../configuration";
 import { RotateButton } from "./RotateButton";
 import { Enemy } from "./Enemy";
 import { Note } from "./Note";
@@ -52,8 +58,8 @@ export class GameMap extends Container {
 	notes: Container<Note>;
 	enemies: Container<Enemy>;
 	snake: Snake;
-	rotateLeft: RotateButton;
-	rotateRight: RotateButton;
+	// rotateLeft: RotateButton;
+	// rotateRight: RotateButton;
 
 	constructor(options: GameMapOptions) {
 		super(options);
@@ -112,23 +118,23 @@ export class GameMap extends Container {
 		}
 		this.snake = tiles.addChild(new Snake({ gameMap: this }));
 		// this.snake.pickTarget(this.apples);
-		this.rotateLeft = this.addChild(
-			new RotateButton({
-				x: 750,
-				y: 1450,
-				gameMap: this,
-				steps: 1,
-			}),
-		);
-		this.rotateRight = this.addChild(
-			new RotateButton({
-				x: 150,
-				y: 1450,
-				gameMap: this,
-				scale: { x: -1, y: 1 },
-				steps: -1,
-			}),
-		);
+		// this.rotateLeft = this.addChild(
+		// 	new RotateButton({
+		// 		x: 750,
+		// 		y: 1450,
+		// 		gameMap: this,
+		// 		steps: 1,
+		// 	}),
+		// );
+		// this.rotateRight = this.addChild(
+		// 	new RotateButton({
+		// 		x: 150,
+		// 		y: 1450,
+		// 		gameMap: this,
+		// 		scale: { x: -1, y: 1 },
+		// 		steps: -1,
+		// 	}),
+		// );
 
 		window.addEventListener("keydown", (event) => {
 			if (event.code == "Space") {
@@ -185,7 +191,7 @@ export class GameMap extends Container {
 		});
 	}
 
-	evolveTimer = 500;
+	evolveTimer = 0;
 
 	dx = 0;
 	evolve() {
@@ -212,9 +218,9 @@ export class GameMap extends Container {
 		// 	(ticker.deltaMS / 1000) * CRT_CONFIGURATION.speed;
 
 		if (this.evolveTimer < 0) {
-			this.dx += 0.1;
+			this.dx += ENV_SPEED / ENV_RATE;
 			this.evolve();
-			this.evolveTimer = 60;
+			this.evolveTimer = 1000 / ENV_RATE;
 		}
 		this.evolveTimer -= ticker.deltaMS;
 	}

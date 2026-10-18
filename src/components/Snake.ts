@@ -17,7 +17,13 @@ import {
 	type Pos,
 } from "../game/map";
 import type { GameMap } from "./GameMap";
-import { BASE_RADIUS, HEIGHT, RADIUS, WIDTH } from "../configuration";
+import {
+	BASE_RADIUS,
+	HEIGHT,
+	RADIUS,
+	SNAKE_SPEED,
+	WIDTH,
+} from "../configuration";
 import { mod } from "../utils/maths";
 import type { Apple } from "./Apple";
 import { randomItem } from "../utils/random";
@@ -107,39 +113,38 @@ export class Snake extends Container {
 	}
 
 	pushAway() {
-		const isFreeAt = ({ col, row }: Pos) => {
+		const isFreeAt = ({ col, row }: Pos, i: number) => {
 			const elevation = this.gameMap.map.array[col]?.[row];
 			if (elevation === undefined || elevation < 0 || elevation > 1) {
 				return false;
-			} else {
-				return true;
 			}
+			if (
+				this.parts.children.some(
+					(part, j) =>
+						j < i && part.pos.col == col && part.pos.row == row,
+				)
+			) {
+				return false;
+			}
+			return true;
 		};
 
-		// console.log(
-		// 	"BEFORE",
-		// 	this.parts.children.map((c) => c.pos),
-		// );
 		let dead = false;
-		// const calculatedPos = [];
 		for (let i = 0; i < this.parts.children.length; i++) {
 			const part = this.parts.children[i];
-			// console.log("i", i, part.pos);
 			if (dead) {
-				// console.log("DEAD", part.pos);
-				this.parts.removeChild(part);
 				part.destroy();
+				this.removeChild(part);
 				i--;
 				continue;
 			}
-			if (
+
+			const isPosAcceptable = (pos: Pos) =>
 				(i == 0 ||
-					hexDistance(this.parts.children[i - 1].pos, part.pos) ==
-						1) &&
-				isFreeAt(part.pos)
-			) {
-				// console.log("It’s ok at", part.pos);
-				// calculatedPos.push(part.pos);
+					hexDistance(this.parts.children[i - 1].pos, pos) == 1) &&
+				isFreeAt(pos, i);
+
+			if (isPosAcceptable(part.pos)) {
 				continue;
 			}
 
@@ -147,48 +152,21 @@ export class Snake extends Container {
 				["left", "left-up", "left-down"] as const
 			).flatMap((direction) => {
 				const newPos = applyDirection(part.pos, direction);
-				if (
-					(i == 0 ||
-						hexDistance(this.parts.children[i - 1].pos, newPos) ==
-							1) &&
-					isFreeAt(newPos)
-				) {
+				if (isPosAcceptable(newPos)) {
 					return [newPos];
 				} else {
 					return [];
 				}
 			});
-			// console.log(
-			// 	"abc",
-			// 	candidates.map((newPos) =>
-			// 		hexDistance(this.parts.children[i - 1].pos, newPos),
-			// 	),
-			// );
 			if (candidates.length > 0) {
 				part.pos = randomItem(candidates);
-				// calculatedPos.push(part.pos);
 			} else {
 				dead = true;
-				// console.log("DEAD!", part.pos);
 				part.destroy();
-				this.parts.removeChild(part);
+				this.removeChild(part);
 				i--;
-				// this.parts.children.splice(i, this.parts.children.length - i);
-				// dead = true;
-				// return;
 			}
 		}
-
-		// console.log(
-		// 	this.parts.children.map(
-		// 		(_, i) =>
-		// 			i > 0 &&
-		// 			hexDistance(
-		// 				this.parts.children[i - 1].pos,
-		// 				this.parts.children[i].pos,
-		// 			),
-		// 	),
-		// );
 
 		this.parts.children.forEach((part, i) => {
 			part.changeType(
@@ -199,30 +177,6 @@ export class Snake extends Container {
 				),
 			);
 		});
-
-		// console.log(
-		// 	this.parts.children.map(
-		// 		(_, i) =>
-		// 			i > 0 &&
-		// 			hexDistance(
-		// 				this.parts.children[i - 1].pos,
-		// 				this.parts.children[i].pos,
-		// 			),
-		// 	),
-		// );
-
-		// console.log(
-		// 	"free",
-		// 	this.parts.children.map((part) => isFreeAt(part.pos)),
-		// );
-
-		// console.log("calculated", calculatedPos);
-
-		// console.log(
-		// 	"AFTER",
-		// 	this.parts.children.map((c) => c.pos),
-		// );
-		// debugger;
 	}
 
 	createPart(
@@ -298,7 +252,7 @@ export class Snake extends Container {
 		}
 
 		if (this.timer <= 0) {
-			this.timer = 200;
+			this.timer = 1000 / SNAKE_SPEED;
 		}
 		this.timer -= ticker.deltaMS;
 	}
@@ -332,11 +286,13 @@ export class Snake extends Container {
 			new SnakePart(this.createPart(newPos, undefined, head.pos)),
 			0,
 		);
-		head.changeType(this.createPart(head.pos, newPos, afterHead.pos));
+		head.changeType(this.createPart(head.pos, newPos, afterHead?.pos));
 		if (!this.isGrowing) {
-			beforeTail.changeType(
-				this.createPart(beforeTail.pos, beforeTail2.pos, undefined),
-			);
+			if (beforeTail2) {
+				beforeTail.changeType(
+					this.createPart(beforeTail.pos, beforeTail2.pos, undefined),
+				);
+			}
 			tail.destroy();
 		}
 		this.isGrowing = false;
