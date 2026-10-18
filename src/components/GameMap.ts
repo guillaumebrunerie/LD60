@@ -58,7 +58,7 @@ export class GameMap extends Container {
 	constructor(options: GameMapOptions) {
 		super(options);
 
-		this.filters = [new CRTFilter(CRT_CONFIGURATION)];
+		// this.filters = [new CRTFilter(CRT_CONFIGURATION)];
 
 		const tiles = this.addChild(new Tiles({ x: 0, y: 0 }));
 		this.map = createMap();
@@ -208,8 +208,8 @@ export class GameMap extends Container {
 
 	update(ticker: Ticker) {
 		super.update(ticker);
-		this.filters[0].time +=
-			(ticker.deltaMS / 1000) * CRT_CONFIGURATION.speed;
+		// this.filters[0].time +=
+		// 	(ticker.deltaMS / 1000) * CRT_CONFIGURATION.speed;
 
 		if (this.evolveTimer < 0) {
 			this.dx += 0.02;
