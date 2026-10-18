@@ -30,17 +30,13 @@ export class Snake extends Container {
 	gameMap: GameMap;
 	parts: Container<SnakePart>;
 	positions: Pos[] = [
-		{ col: WIDTH - 2, row: Math.round(HEIGHT / 2) },
-		{ col: WIDTH - 1, row: Math.round(HEIGHT / 2) },
-		{ col: WIDTH, row: Math.round(HEIGHT / 2) },
-		{ col: WIDTH + 1, row: Math.round(HEIGHT / 2) },
-		{ col: WIDTH + 2, row: Math.round(HEIGHT / 2) },
-		{ col: WIDTH + 3, row: Math.round(HEIGHT / 2) },
-		{ col: WIDTH + 4, row: Math.round(HEIGHT / 2) },
+		{ col: 2, row: Math.round(HEIGHT / 2) },
+		{ col: 1, row: Math.round(HEIGHT / 2) },
+		{ col: 0, row: Math.round(HEIGHT / 2) },
 	];
 	nextSteps: Pos[] = [];
 	timer = 0;
-	direction: Direction = "left-up";
+	direction: Direction = "right";
 
 	constructor(options: SnakeOptions) {
 		super({

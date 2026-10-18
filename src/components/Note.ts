@@ -19,12 +19,12 @@ export class Note extends Container {
 		});
 		this.gameMap = options.gameMap;
 		this.pos = options.pos;
-		this.addChild(
-			new Sprite({
-				texture: Assets.get(`MusicNote.png`),
-				anchor: 0.5,
-			}),
-		);
+		// this.addChild(
+		// 	new Sprite({
+		// 		texture: Assets.get(`MusicNote.png`),
+		// 		anchor: 0.5,
+		// 	}),
+		// );
 	}
 
 	move(pos: Pos) {

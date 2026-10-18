@@ -212,7 +212,7 @@ export class GameMap extends Container {
 		// 	(ticker.deltaMS / 1000) * CRT_CONFIGURATION.speed;
 
 		if (this.evolveTimer < 0) {
-			this.dx += 0.02;
+			this.dx += 0.1;
 			this.evolve();
 			this.evolveTimer = 60;
 		}

@@ -20,16 +20,16 @@ export class Player extends Container {
 		});
 		this.gameMap = options.gameMap;
 		this.pos = options.pos;
-		const playerG = new Graphics();
-		playerG.circle(0, 0, 10);
-		playerG.fill(
-			new Color({
-				r: 255,
-				g: 255,
-				b: 0,
-			}),
-		);
-		this.addChild(playerG);
+		// const playerG = new Graphics();
+		// playerG.circle(0, 0, 10);
+		// playerG.fill(
+		// 	new Color({
+		// 		r: 255,
+		// 		g: 255,
+		// 		b: 0,
+		// 	}),
+		// );
+		// this.addChild(playerG);
 	}
 
 	update(ticker: Ticker) {

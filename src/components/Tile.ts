@@ -58,13 +58,13 @@ export class Tile extends Container {
 				ids = ["Blocker_Water_01"];
 				break;
 			case 0:
-				ids = ["Blocker_Border_01"]; //, "Grass_02", "Grass_03"];
+				ids = ["Blocker_Border_01"];
 				break;
 			case 0.5:
-				ids = ["Grass_01", "Grass_02", "Grass_03"];
+				ids = ["Ground_01", "Ground_02", "Ground_03"];
 				break;
 			case 1:
-				ids = ["Ground_01", "Ground_02", "Ground_03"];
+				ids = ["Grass_01", "Grass_02", "Grass_03"];
 				break;
 			case 2:
 				ids = ["Mountain_Low_01"];
