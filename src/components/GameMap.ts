@@ -25,6 +25,7 @@ import {
 	ENV_SPEED,
 	HEIGHT,
 	RADIUS,
+	SNAKE_SPEED,
 	WIDTH,
 } from "../configuration";
 import { RotateButton } from "./RotateButton";
@@ -221,6 +222,23 @@ export class GameMap extends Container {
 		// 	}),
 		// );
 
+		const dest = {
+			x: clamp(
+				-this.snake.parts.children[0].x,
+				450 - RADIUS * (WIDTH - 1) * Math.sqrt(3),
+				-450,
+			),
+			y: clamp(
+				-this.snake.parts.children[0].y,
+				800 - RADIUS * (HEIGHT - 1) * 1.5,
+				-800,
+			),
+		};
+		this.tt.x = dest.x;
+		this.tt.y = dest.y;
+		this.dest.x = this.tt.x;
+		this.dest.y = this.tt.y;
+
 		// this.viewport.follow(this.snake.parts.children[0]);
 	}
 
@@ -297,24 +315,32 @@ export class GameMap extends Container {
 		// }
 
 		console.log(this.tt.x, this.snake.parts.children[0].x);
-		this.tt.x = -clamp(
-			this.snake.parts.children[0].x,
-			450,
-			RADIUS * (WIDTH - 1) * Math.sqrt(3) - 450,
-		);
-		this.tt.y = -clamp(
-			this.snake.parts.children[0].y,
-			800,
-			RADIUS * (HEIGHT - 1) * 1.5 - 800,
-		);
+		const dest = {
+			x: -this.snake.parts.children[0].x,
+			y: -this.snake.parts.children[0].y,
+		};
 
-		// const v = {
-		// 	x: this.dest.x - this.tt.x,
-		// 	y: this.dest.y - this.tt.y,
-		// };
-		// const distance
+		const v = {
+			x: dest.x - this.dest.x,
+			y: dest.y - this.dest.y,
+		};
+		const vh = Math.sqrt(v.x * v.x + v.y * v.y);
+		const speed = (RADIUS * Math.sqrt(3)) / (1000 / SNAKE_SPEED);
+		const desiredDistance = speed * ticker.deltaMS;
+		this.dest =
+			vh < desiredDistance ?
+				{ ...dest }
+			:	{
+					x: this.tt.x + (v.x / vh) * desiredDistance,
+					y: this.tt.y + (v.y / vh) * desiredDistance,
+				};
+		this.tt.x = clamp(
+			this.dest.x,
+			450 - RADIUS * (WIDTH - 1) * Math.sqrt(3),
+			-450,
+		);
+		this.tt.y = clamp(this.dest.y, 800 - RADIUS * (HEIGHT - 1) * 1.5, -800);
 	}
-
 	dest = { x: 0, y: 0 };
 
 	moveInProgress = false;
