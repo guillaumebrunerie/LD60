@@ -1,12 +1,4 @@
-import {
-	Assets,
-	Color,
-	Graphics,
-	Point,
-	Polygon,
-	Sprite,
-	type ContainerOptions,
-} from "pixi.js";
+import { Assets, Point, Polygon, Sprite, type ContainerOptions } from "pixi.js";
 import { Container } from "../PausableContainer";
 import { calculatePos, type Pos } from "../game/map";
 import type { GameMap } from "./GameMap";
@@ -64,10 +56,10 @@ export class Tile extends Container {
 				ids = ["Blocker_Water_01"];
 				break;
 			case 0:
-				ids = ["Grass_01", "Grass_02", "Grass_03"];
+				ids = ["Grass_01"]; //, "Grass_02", "Grass_03"];
 				break;
 			case 1:
-				ids = ["Ground_01", "Ground_02", "Ground_03"];
+				ids = ["Ground_01"]; //, "Ground_02", "Ground_03"];
 				break;
 			case 2:
 				ids = ["Mountain_Low_01"];

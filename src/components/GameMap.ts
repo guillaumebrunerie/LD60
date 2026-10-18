@@ -141,7 +141,7 @@ export class GameMap extends Container {
 	evolve() {
 		for (let a = 0; a < this.map.noise.vectors.length; a++) {
 			for (let b = 0; b < this.map.noise.vectors[0].length; b++) {
-				this.map.noise.vectors[a][b] += 0.02;
+				this.map.noise.vectors[a][b] += 0.002;
 			}
 		}
 		for (const tile of this.tiles) {
@@ -162,9 +162,9 @@ export class GameMap extends Container {
 			(ticker.deltaMS / 1000) * CRT_CONFIGURATION.speed;
 
 		if (this.evolveTimer < 0) {
-			this.dx += 1;
+			this.dx += 0.02;
 			this.evolve();
-			this.evolveTimer = 600;
+			this.evolveTimer = 60;
 		}
 		this.evolveTimer -= ticker.deltaMS;
 	}
