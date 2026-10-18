@@ -1,4 +1,4 @@
-import { ELEVATION_SCALE, HEIGHT, RADIUS, WIDTH } from "../configuration";
+import { ELEVATION_SCALE, HEIGHT, RADIUS, SIZE, WIDTH } from "../configuration";
 import { mod } from "../utils/maths";
 import { PerlinNoise } from "../utils/perlinNoise";
 import { randomInt } from "../utils/random";
@@ -20,8 +20,8 @@ export const calculateElevation = (noise: PerlinNoise, pos: Pos) => {
 		x: xy.x / RADIUS / ELEVATION_SCALE,
 		y: xy.y / RADIUS / ELEVATION_SCALE,
 	});
-	if (xy.x < RADIUS * 30) {
-		data *= Math.pow(xy.x / (RADIUS * 30), 2);
+	if (xy.x < RADIUS * 10) {
+		data *= Math.pow(xy.x / (RADIUS * 10), 2);
 	}
 
 	// if (Math.abs(xy.x - RADIUS * 100) < RADIUS * 5) {
@@ -47,14 +47,14 @@ export const calculateElevation = (noise: PerlinNoise, pos: Pos) => {
 	} else {
 		elevation = 4;
 	}
-	if (
-		// pos.col == 0 ||
-		// pos.col == WIDTH - 1 ||
-		pos.row == 0 ||
-		pos.row == HEIGHT - 1
-	) {
-		elevation = 5;
-	}
+	// if (
+	// 	// pos.col == 0 ||
+	// 	// pos.col == WIDTH - 1 ||
+	// 	pos.row == 0 ||
+	// 	pos.row == HEIGHT - 1
+	// ) {
+	// 	elevation = 5;
+	// }
 	return elevation;
 };
 
@@ -62,12 +62,20 @@ export const createMap = (): Map => {
 	const noise = new PerlinNoise({ width: 5, height: 5 });
 	const tiles: Map["tiles"] = [];
 	const array: number[][] = [];
-	for (let col = 0; col < WIDTH; col++) {
+	const midPoint = { col: SIZE, row: SIZE };
+	for (let col = 0; col < SIZE * 2 + 1; col++) {
 		array[col] = [];
-		for (let row = 0; row < HEIGHT; row++) {
+		for (let row = 0; row < SIZE * 2 + 1; row++) {
 			const pos = { col, row };
 
-			const elevation = calculateElevation(noise, pos);
+			let elevation = calculateElevation(noise, pos);
+			const d = hexDistance(pos, midPoint);
+			console.log(d);
+			if (d > SIZE) {
+				continue;
+			} else if (d == SIZE) {
+				elevation = 5;
+			}
 
 			tiles.push({ pos, elevation });
 			array[col][row] = elevation;
@@ -76,8 +84,8 @@ export const createMap = (): Map => {
 
 	const map = { noise, array, tiles, apples: [], notes: [] };
 
-	for (let k = 0; k < 10; k++) {
-		addApple(map, 20);
+	for (let k = 0; k < 3; k++) {
+		addApple(map);
 	}
 
 	for (let k = 0; k < 3; k++) {
@@ -87,10 +95,10 @@ export const createMap = (): Map => {
 	return map;
 };
 
-export const pickAvailablePosition = (map: Map, minCol: number) => {
+export const pickAvailablePosition = (map: Map) => {
 	for (let tries = 0; tries < 100; tries++) {
 		const pos = {
-			col: randomInt(minCol, minCol + 20),
+			col: randomInt(0, WIDTH - 1),
 			row: randomInt(0, HEIGHT - 1),
 		};
 		const elevation = map.array[pos.col]?.[pos.row];
@@ -101,8 +109,8 @@ export const pickAvailablePosition = (map: Map, minCol: number) => {
 	}
 };
 
-export const addApple = (map: Map, minCol: number) => {
-	const pos = pickAvailablePosition(map, minCol);
+export const addApple = (map: Map) => {
+	const pos = pickAvailablePosition(map);
 	if (pos) {
 		map.apples.push(pos);
 	}
@@ -116,7 +124,7 @@ export const addNote = (map: Map) => {
 	}
 };
 
-export const calculatePos = ({ col, row }: Pos, radius = 1): XYPoint => {
+export const calculatePos = ({ col, row }: Pos, radius = RADIUS): XYPoint => {
 	const x =
 		col * radius * Math.sqrt(3) + (mod(row, 2) * radius * Math.sqrt(3)) / 2;
 	const y = row * radius * 1.5;

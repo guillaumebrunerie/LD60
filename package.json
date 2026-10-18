@@ -15,6 +15,7 @@
     "@pixi/ui": "^2.3.2",
     "motion": "^14.3.0",
     "pixi-filters": "^6.1.5",
+    "pixi-viewport": "^6.0.3",
     "pixi.js": "^8.17.1"
   },
   "devDependencies": {

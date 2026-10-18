@@ -1,5 +1,3 @@
-- Do not snip tail
-- Queue moves
+- Queue the moves
 - All other screens
 - Score
-- Make it loop

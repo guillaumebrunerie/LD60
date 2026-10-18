@@ -87,6 +87,9 @@ export class Tile extends Container {
 				ids = ["Frame_01"];
 				break;
 		}
+		if (ids.length == 0) {
+			return;
+		}
 		const id = randomItem(ids);
 
 		this.removeChildren();

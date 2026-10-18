@@ -8,7 +8,12 @@ export class MapScreen extends Container {
 	constructor(options?: ContainerOptions) {
 		super(options);
 
-		this.addChild(new GameMap({}));
+		this.addChild(
+			new GameMap({
+				x: 900 / 2,
+				y: 1600 / 2,
+			}),
+		);
 
 		this.ticker = new Ticker();
 		this.ticker.add(() => this.update(this.ticker));

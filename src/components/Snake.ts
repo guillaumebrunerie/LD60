@@ -129,26 +129,29 @@ export class Snake extends Container {
 			return true;
 		};
 
-		let dead = false;
+		// let dead = false;
 		for (let i = 0; i < this.parts.children.length; i++) {
 			const part = this.parts.children[i];
-			if (dead) {
-				part.destroy();
-				this.removeChild(part);
-				i--;
+			// if (dead) {
+			// 	part.destroy();
+			// 	this.removeChild(part);
+			// 	i--;
+			// 	continue;
+			// }
+
+			const isPosAcceptable = (pos: Pos, from = part.pos) =>
+				(i == 0 || hexDistance(from, pos) == 1) && isFreeAt(pos, i);
+
+			if (
+				isPosAcceptable(
+					part.pos,
+					this.parts.children[Math.max(0, i - 1)].pos,
+				)
+			) {
 				continue;
 			}
 
-			const isPosAcceptable = (pos: Pos) =>
-				(i == 0 ||
-					hexDistance(this.parts.children[i - 1].pos, pos) == 1) &&
-				isFreeAt(pos, i);
-
-			if (isPosAcceptable(part.pos)) {
-				continue;
-			}
-
-			const candidates = (
+			const allCandidates = (
 				[
 					"left",
 					"left-up",
@@ -157,21 +160,23 @@ export class Snake extends Container {
 					"right-down",
 					"right",
 				] as const
-			).flatMap((direction) => {
-				const newPos = applyDirection(part.pos, direction);
-				if (isPosAcceptable(newPos)) {
-					return [newPos];
-				} else {
-					return [];
-				}
-			});
-			if (candidates.length > 0) {
-				part.pos = randomItem(candidates);
+			).map((direction) =>
+				applyDirection(
+					this.parts.children[Math.max(0, i - 1)].pos,
+					direction,
+				),
+			);
+			const goodCandidates = allCandidates.filter((pos) =>
+				isPosAcceptable(pos),
+			);
+			if (goodCandidates.length > 0) {
+				part.pos = randomItem(goodCandidates);
 			} else {
-				dead = true;
-				part.destroy();
-				this.removeChild(part);
-				i--;
+				part.pos = this.parts.children[Math.max(0, i - 1)].pos;
+				// dead = true;
+				// part.destroy();
+				// this.removeChild(part);
+				// i--;
 			}
 		}
 

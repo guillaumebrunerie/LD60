@@ -30,7 +30,9 @@ import {
 import { RotateButton } from "./RotateButton";
 import { Enemy } from "./Enemy";
 import { Note } from "./Note";
-import { getDistance, length, mod } from "../utils/maths";
+import { clamp, getDistance, length, mod } from "../utils/maths";
+// import { Viewport } from "pixi-viewport";
+// import { app } from "../getEngine";
 
 type TilesOptions = ContainerOptions & {
 	// setPlayerTarget: (i: number, j: number) => void;
@@ -126,20 +128,22 @@ export class GameMap extends Container {
 	}
 
 	tt: Tiles;
+	// viewport: Viewport;
 	startGame() {
 		this.evolveTimer = 0;
 		this.dx = 0;
 
-		const left = (RADIUS * Math.sqrt(3)) / 2;
-		const width = WIDTH * RADIUS * Math.sqrt(3);
-		const top = (RADIUS * 1.5) / 2;
-		const height = HEIGHT * RADIUS * 1.5;
-		const tiles = (this.tt = this.addChild(
-			new Tiles({
-				x: 0, //(900 - width) / 2 + left,
-				y: (1600 - height) / 2 + top,
-			}),
-		));
+		// this.viewport = this.addChild(
+		// 	new Viewport({
+		// 		screenWidth: window.innerWidth,
+		// 		screenHeight: window.innerHeight,
+		// 		worldWidth: width,
+		// 		worldHeight: height,
+		// 		events: app().renderer.events,
+		// 	}),
+		// );
+
+		const tiles = (this.tt = this.addChild(new Tiles({})));
 		this.map = createMap();
 
 		this.tiles.forEach((tile) => tile.destroy());
@@ -216,6 +220,8 @@ export class GameMap extends Container {
 		// 		steps: -1,
 		// 	}),
 		// );
+
+		// this.viewport.follow(this.snake.parts.children[0]);
 	}
 
 	gameOver() {
@@ -228,17 +234,22 @@ export class GameMap extends Container {
 	evolve() {
 		for (let a = 0; a < this.map.noise.vectors.length; a++) {
 			for (let b = 0; b < this.map.noise.vectors[0].length; b++) {
-				this.map.noise.vectors[a][b] += 0.002;
+				// this.map.noise.vectors[a][b] += 0.002;
 			}
 		}
-		for (const tile of this.tiles) {
-			const newElevation = calculateElevation(this.map.noise, {
-				col: tile.pos.col + this.dx,
-				row: tile.pos.row,
-			});
-			tile.setElevation(newElevation);
-			this.map.array[tile.pos.col][tile.pos.row] = newElevation;
-		}
+		// for (const tile of this.tiles) {
+		// 	const x = calculatePos(tile.pos).x;
+		// 	const isLeft = false; //x + this.tt.x <= 50;
+		// 	const newElevation =
+		// 		isLeft ? 5 : (
+		// 			calculateElevation(this.map.noise, {
+		// 				col: tile.pos.col + this.dx,
+		// 				row: tile.pos.row,
+		// 			})
+		// 		);
+		// 	tile.setElevation(newElevation);
+		// 	this.map.array[tile.pos.col][tile.pos.row] = newElevation;
+		// }
 
 		this.snake.pushAway();
 	}
@@ -254,8 +265,10 @@ export class GameMap extends Container {
 			this.evolveTimer = 1000 / ENV_RATE;
 		}
 		this.evolveTimer -= ticker.deltaMS;
-		this.tt.x -=
-			((ENV_SPEED * ticker.deltaMS) / 1000) * RADIUS * Math.sqrt(3);
+		// if (this.tt.x > -RADIUS * 100) {
+		// this.tt.x -=
+		// 	((ENV_SPEED * ticker.deltaMS) / 1000) * RADIUS * Math.sqrt(3);
+		// }
 
 		for (const apple of this.apples.children) {
 			if (apple.pos.col < this.snake.headPos().col - 30) {
@@ -263,10 +276,7 @@ export class GameMap extends Container {
 				apple.removeFromParent();
 				this.snake.pickTarget(this.apples);
 
-				const newApple = addApple(
-					this.map,
-					this.snake.headPos().col + 20,
-				);
+				const newApple = addApple(this.map);
 				if (newApple) {
 					this.apples.addChild(
 						new Apple({
@@ -278,14 +288,34 @@ export class GameMap extends Container {
 			}
 		}
 
-		const leftThreshold = -50;
-		if (
-			calculatePos(this.snake.headPos(), RADIUS).x + this.tt.x <
-			leftThreshold
-		) {
-			this.gameOver();
-		}
+		// const leftThreshold = -50;
+		// if (
+		// 	calculatePos(this.snake.headPos(), RADIUS).x + this.tt.x <
+		// 	leftThreshold
+		// ) {
+		// 	this.gameOver();
+		// }
+
+		console.log(this.tt.x, this.snake.parts.children[0].x);
+		this.tt.x = -clamp(
+			this.snake.parts.children[0].x,
+			450,
+			RADIUS * (WIDTH - 1) * Math.sqrt(3) - 450,
+		);
+		this.tt.y = -clamp(
+			this.snake.parts.children[0].y,
+			800,
+			RADIUS * (HEIGHT - 1) * 1.5 - 800,
+		);
+
+		// const v = {
+		// 	x: this.dest.x - this.tt.x,
+		// 	y: this.dest.y - this.tt.y,
+		// };
+		// const distance
 	}
+
+	dest = { x: 0, y: 0 };
 
 	moveInProgress = false;
 	rotate(pivot: Pos, radius: number, steps: number) {
