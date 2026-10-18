@@ -12,6 +12,7 @@ import {
 	calculatePos,
 	findBestPath,
 	hexDistance,
+	oppositeDirection,
 	type Direction,
 	type Pos,
 } from "../game/map";
