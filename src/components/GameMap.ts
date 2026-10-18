@@ -3,6 +3,7 @@ import { Container } from "../PausableContainer";
 import { Tile } from "./Tile";
 import {
 	addApple,
+	calculateElevation,
 	createMap,
 	findBestPath,
 	hexDistance,
@@ -79,14 +80,14 @@ export class GameMap extends Container {
 		);
 
 		this.enemies = tiles.addChild(new Container<Enemy>());
-		for (const pos of this.map.apples) {
-			this.enemies.addChild(
-				new Enemy({
-					gameMap: this,
-					pos,
-				}),
-			);
-		}
+		// for (const pos of this.map.apples) {
+		// 	this.enemies.addChild(
+		// 		new Enemy({
+		// 			gameMap: this,
+		// 			pos,
+		// 		}),
+		// 	);
+		// }
 
 		this.notes = tiles.addChild(new Container<Note>());
 		for (const pos of this.map.notes) {
@@ -99,15 +100,15 @@ export class GameMap extends Container {
 		}
 
 		this.apples = tiles.addChild(new Container<Apple>());
-		// for (const pos of this.map.apples) {
-		// 	this.apples.addChild(
-		// 		new Apple({
-		// 			gameMap: this,
-		// 			pos,
-		// 		}),
-		// 	);
-		// }
-		// this.snake = tiles.addChild(new Snake({ gameMap: this }));
+		for (const pos of this.map.apples) {
+			this.apples.addChild(
+				new Apple({
+					gameMap: this,
+					pos,
+				}),
+			);
+		}
+		this.snake = tiles.addChild(new Snake({ gameMap: this }));
 		// this.snake.pickTarget(this.apples);
 		this.rotateLeft = this.addChild(
 			new RotateButton({
@@ -129,15 +130,43 @@ export class GameMap extends Container {
 
 		window.addEventListener("keydown", (event) => {
 			if (event.code == "Space") {
-				this.rotate(this.player.pos, 3, event.shiftKey ? -1 : 1);
+				// this.rotate(this.player.pos, 3, event.shiftKey ? -1 : 1);
 			}
 		});
+	}
+
+	evolveTimer = 500;
+
+	dx = 0;
+	evolve() {
+		for (let a = 0; a < this.map.noise.vectors.length; a++) {
+			for (let b = 0; b < this.map.noise.vectors[0].length; b++) {
+				this.map.noise.vectors[a][b] += 0.02;
+			}
+		}
+		for (const tile of this.tiles) {
+			const newElevation = calculateElevation(this.map.noise, {
+				col: tile.pos.col + this.dx,
+				row: tile.pos.row,
+			});
+			tile.setElevation(newElevation);
+			this.map.array[tile.pos.col][tile.pos.row] = newElevation;
+		}
+
+		// this.snake.pushAway();
 	}
 
 	update(ticker: Ticker) {
 		super.update(ticker);
 		this.filters[0].time +=
 			(ticker.deltaMS / 1000) * CRT_CONFIGURATION.speed;
+
+		if (this.evolveTimer < 0) {
+			this.dx += 1;
+			this.evolve();
+			this.evolveTimer = 600;
+		}
+		this.evolveTimer -= ticker.deltaMS;
 	}
 
 	moveInProgress = false;

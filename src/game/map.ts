@@ -7,10 +7,45 @@ export type Pos = { col: number; row: number };
 export type XYPoint = { x: number; y: number };
 
 export type Map = {
+	noise: PerlinNoise;
 	array: number[][];
 	tiles: { pos: Pos; elevation: number }[];
 	apples: Pos[];
 	notes: Pos[];
+};
+
+export const calculateElevation = (noise: PerlinNoise, pos: Pos) => {
+	const xy = calculatePos(pos, RADIUS);
+	const data = noise.sample({
+		x: xy.x / RADIUS / ELEVATION_SCALE,
+		y: xy.y / RADIUS / ELEVATION_SCALE,
+	});
+
+	let elevation;
+	if (data < -0.3) {
+		// Water
+		elevation = -1;
+	} else if (data < -0.15) {
+		elevation = 0;
+	} else if (data < 0.1) {
+		// Mountains
+		elevation = 1;
+	} else if (data < 0.2) {
+		elevation = 2;
+	} else if (data < 0.35) {
+		elevation = 3;
+	} else {
+		elevation = 4;
+	}
+	if (
+		pos.col == 0 ||
+		pos.col == WIDTH - 1 ||
+		pos.row == 0 ||
+		pos.row == HEIGHT - 1
+	) {
+		elevation = 4;
+	}
+	return elevation;
 };
 
 export const createMap = (): Map => {
@@ -21,38 +56,15 @@ export const createMap = (): Map => {
 		array[col] = [];
 		for (let row = 0; row < HEIGHT; row++) {
 			const pos = { col, row };
-			const xy = calculatePos(pos, RADIUS);
-			const data = noise.sample({
-				x: xy.x / RADIUS / ELEVATION_SCALE,
-				y: xy.y / RADIUS / ELEVATION_SCALE,
-			});
 
-			let elevation;
-			if (data < -0.3) {
-				// Water
-				elevation = -1;
-			} else if (data < -0.15) {
-				elevation = 0;
-			} else if (data < 0.1) {
-				// Mountains
-				elevation = 1;
-			} else if (data < 0.2) {
-				elevation = 2;
-			} else if (data < 0.35) {
-				elevation = 3;
-			} else {
-				elevation = 4;
-			}
-			if (col == 0 || col == WIDTH - 1 || row == 0 || row == HEIGHT - 1) {
-				elevation = 4;
-			}
+			const elevation = calculateElevation(noise, pos);
 
 			tiles.push({ pos, elevation });
 			array[col][row] = elevation;
 		}
 	}
 
-	const map = { array, tiles, apples: [], notes: [] };
+	const map = { noise, array, tiles, apples: [], notes: [] };
 
 	for (let k = 0; k < 10; k++) {
 		addApple(map);
@@ -225,5 +237,25 @@ export const findBestPath = (
 				toVisitNext.push(otherPos);
 			}
 		}
+	}
+};
+
+export type Direction =
+	"left" | "left-up" | "right-up" | "right" | "right-down" | "left-down";
+
+export const applyDirection = ({ col, row }: Pos, direction: Direction) => {
+	switch (direction) {
+		case "left":
+			return { col: col - 1, row };
+		case "left-up":
+			return { col: col - mod(row + 1, 2), row: row - 1 };
+		case "right-up":
+			return { col: col - mod(row + 1, 2) + 1, row: row - 1 };
+		case "right":
+			return { col: col + 1, row };
+		case "right-down":
+			return { col: col - mod(row + 1, 2) + 1, row: row + 1 };
+		case "left-down":
+			return { col: col - mod(row + 1, 2), row: row + 1 };
 	}
 };

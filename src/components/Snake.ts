@@ -7,11 +7,19 @@ import {
 	type ContainerOptions,
 } from "pixi.js";
 import { Container } from "../PausableContainer";
-import { calculatePos, findBestPath, type Pos } from "../game/map";
+import {
+	applyDirection,
+	calculatePos,
+	findBestPath,
+	hexDistance,
+	type Direction,
+	type Pos,
+} from "../game/map";
 import type { GameMap } from "./GameMap";
 import { BASE_RADIUS, HEIGHT, RADIUS, WIDTH } from "../configuration";
 import { mod } from "../utils/maths";
 import type { Apple } from "./Apple";
+import { randomItem } from "../utils/random";
 
 type SnakeOptions = ContainerOptions & {
 	gameMap: GameMap;
@@ -24,9 +32,13 @@ export class Snake extends Container {
 		{ col: WIDTH - 2, row: Math.round(HEIGHT / 2) },
 		{ col: WIDTH - 1, row: Math.round(HEIGHT / 2) },
 		{ col: WIDTH, row: Math.round(HEIGHT / 2) },
+		{ col: WIDTH + 1, row: Math.round(HEIGHT / 2) },
+		{ col: WIDTH + 2, row: Math.round(HEIGHT / 2) },
+		{ col: WIDTH + 3, row: Math.round(HEIGHT / 2) },
 	];
 	nextSteps: Pos[] = [];
 	timer = 0;
+	direction: Direction = "left";
 
 	constructor(options: SnakeOptions) {
 		super({
@@ -47,6 +59,107 @@ export class Snake extends Container {
 				),
 			);
 		});
+
+		window.addEventListener("keydown", (event) => {
+			switch (`${event.code}/${this.direction}`) {
+				case "ArrowLeft/left-up":
+				case "ArrowLeft/left-down":
+					this.direction = "left";
+					break;
+				case "ArrowLeft/right-up":
+					this.direction = "left-up";
+					break;
+				case "ArrowLeft/right-down":
+					this.direction = "left-down";
+					break;
+				case "ArrowRight/right-up":
+				case "ArrowRight/right-down":
+					this.direction = "right";
+					break;
+				case "ArrowRight/left-up":
+					this.direction = "right-up";
+					break;
+				case "ArrowRight/left-down":
+					this.direction = "right-down";
+					break;
+				case "ArrowUp/left":
+				case "ArrowUp/left-down":
+					this.direction = "left-up";
+					break;
+				case "ArrowUp/right":
+				case "ArrowUp/right-down":
+					this.direction = "right-up";
+					break;
+				case "ArrowDown/left":
+				case "ArrowDown/left-up":
+					this.direction = "left-down";
+					break;
+				case "ArrowDown/right":
+				case "ArrowDown/right-up":
+					this.direction = "right-down";
+					break;
+			}
+		});
+	}
+
+	pushAway() {
+		console.log(
+			"BEFORE",
+			this.parts.children.map((c) => c.pos),
+		);
+		let deadAt = -1;
+		this.parts.children.forEach((part, i) => {
+			if (deadAt >= 0) {
+				return;
+			}
+			const { col, row } = part.pos;
+			const elevation = this.gameMap.map.array[col]?.[row];
+			if (elevation === undefined || (elevation >= 0 && elevation <= 1)) {
+				return;
+			}
+			const candidates = (
+				["left", "left-up", "left-down"] as const
+			).flatMap((direction) => {
+				const newPos = applyDirection(part.pos, direction);
+				if (
+					i == 0 ||
+					hexDistance(this.parts.children[i - 1].pos, newPos) == 1
+				) {
+					return [newPos];
+				} else {
+					return [];
+				}
+			});
+			if (candidates.length > 0) {
+				part.pos = randomItem(candidates);
+			} else {
+				deadAt = i;
+				// this.parts.children.splice(i, this.parts.children.length - i);
+				// dead = true;
+				// return;
+			}
+		});
+
+		this.parts.children.forEach((part, i) => {
+			part.changeType(
+				this.createPart(
+					part.pos,
+					this.parts.children[i - 1]?.pos,
+					this.parts.children[i + 1]?.pos,
+				),
+			);
+		});
+		if (deadAt >= 0) {
+			for (const c of this.parts.removeChildren(deadAt)) {
+				c.destroy();
+			}
+		}
+
+		console.log(
+			"AFTER",
+			this.parts.children.map((c) => c.pos),
+		);
+		// debugger;
 	}
 
 	createPart(
@@ -107,10 +220,17 @@ export class Snake extends Container {
 	}
 
 	update(ticker: Ticker) {
-		if (this.timer <= 0 && this.nextSteps.length > 0) {
-			this.moveTo(this.nextSteps.shift()!);
-			this.nextSteps = [];
-			this.pickTarget(this.gameMap.apples);
+		// if (this.timer <= 0 && this.nextSteps.length > 0) {
+		// 	this.moveTo(this.nextSteps.shift()!);
+		// 	this.nextSteps = [];
+		// 	this.pickTarget(this.gameMap.apples);
+		// }
+
+		if (this.timer <= 0) {
+			this.moveTo(applyDirection(this.headPos(), this.direction));
+			// this.moveTo(this.nextSteps.shift()!);
+			// this.nextSteps = [];
+			// this.pickTarget(this.gameMap.apples);
 		}
 
 		if (this.timer <= 0) {
@@ -190,7 +310,7 @@ const getSnakeTexture = (type: SnakePartType) => {
 };
 
 class SnakePart extends Container {
-	pos: Pos;
+	pos: Pos = { col: -1, row: -1 };
 	constructor(options: SnakePartOptions) {
 		super({
 			...options,
@@ -198,14 +318,15 @@ class SnakePart extends Container {
 			scale: RADIUS / BASE_RADIUS,
 			eventMode: "none",
 		});
-		this.pos = options.pos;
-		this.addChild(
-			new Sprite({
-				anchor: 0.5,
-				texture: getSnakeTexture(options.type),
-				eventMode: "none",
-			}),
-		);
+		this.changeType(options);
+		// this.pos = options.pos;
+		// this.addChild(
+		// 	new Sprite({
+		// 		anchor: 0.5,
+		// 		texture: getSnakeTexture(options.type),
+		// 		eventMode: "none",
+		// 	}),
+		// );
 	}
 
 	changeType(options: SnakePartOptions) {
@@ -218,5 +339,8 @@ class SnakePart extends Container {
 			}),
 		);
 		this.rotation = options.rotation || 0;
+		if (options.pos) {
+			this.pos = options.pos;
+		}
 	}
 }

@@ -47,7 +47,12 @@ export class Enemy extends Container {
 	pickTarget() {
 		const pathAndDistance = findBestPath(
 			this.gameMap.map,
-			[], //this.gameMap.snake.parts.children.map((part) => part.pos),
+			[
+				...this.gameMap.enemies.children.map((part) => part.pos),
+				...this.gameMap.enemies.children
+					.map((part) => part.nextSteps[0])
+					.filter(Boolean),
+			],
 			this.pos,
 			[this.gameMap.player.pos],
 		);

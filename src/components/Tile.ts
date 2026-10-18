@@ -47,10 +47,17 @@ export class Tile extends Container {
 			new Point(-b, c),
 		]);
 
-		// const alpha = (data + 1) / 2;
-		// const id = 1;
+		this.setElevation(options.elevation);
 
-		const alpha = 1;
+		this.onpointerdown = () => {
+			this.gameMap.clearTargets();
+			this.gameMap.addTarget(this.pos);
+		};
+	}
+
+	setElevation(elevation: number) {
+		this.elevation = elevation;
+
 		let ids: string[] = [];
 		switch (this.elevation) {
 			case -1:
@@ -73,27 +80,13 @@ export class Tile extends Container {
 		}
 		const id = randomItem(ids);
 
-		// let id = 1;
-		// if (this.elevation < -0.1) {
-		// 	id = 2;
-		// } else if (this.elevation > 0.1) {
-		// 	id = 3;
-		// }
-		// const id = randomInt(1, 3);
-
+		this.removeChildren();
 		this.addChild(
 			new Sprite({
 				texture: Assets.get(`MapTile_${id}.png`),
 				anchor: 0.5,
-				alpha,
 			}),
 		);
-
-		this.onpointerdown = () => {
-			this.gameMap.clearTargets();
-			this.gameMap.addTarget(this.pos);
-			// this.gameMap.rotate(this.pos, randomRange(1, 5));
-		};
 	}
 
 	move(pos: Pos, angle: number) {

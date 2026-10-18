@@ -20,7 +20,7 @@ const interpolate = (a: number, b: number, t: number) =>
 export class PerlinNoise {
 	width: number;
 	height: number;
-	vectors: XYPoint[][];
+	vectors: number[][];
 
 	constructor({ width, height }: { width: number; height: number }) {
 		this.width = width;
@@ -31,10 +31,7 @@ export class PerlinNoise {
 			const col = [];
 			for (let y = 0; y < height; y++) {
 				const angle = randomRange(0, 2 * Math.PI);
-				col.push({
-					x: Math.cos(angle),
-					y: Math.sin(angle),
-				});
+				col.push(angle);
 			}
 			this.vectors.push(col);
 		}
@@ -50,7 +47,7 @@ export class PerlinNoise {
 			};
 			const v = this.vectors[point.x][point.y];
 			const d = { x: xy.x - (x + dx), y: xy.y - (y + dy) };
-			return dot(d, v);
+			return dot(d, { x: Math.cos(v), y: Math.sin(v) });
 		};
 		return interpolate(
 			interpolate(getData(0, 0), getData(1, 0), xy.x - x),

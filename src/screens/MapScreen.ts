@@ -14,4 +14,12 @@ export class MapScreen extends Container {
 		this.ticker.add(() => this.update(this.ticker));
 		this.ticker.start();
 	}
+
+	pause() {
+		this.ticker.stop();
+	}
+
+	resume() {
+		this.ticker.start();
+	}
 }
