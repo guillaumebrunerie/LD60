@@ -13,7 +13,7 @@ type TileOptions = ContainerOptions & {
 
 export class Tile extends Container {
 	pos: Pos;
-	elevation: number;
+	elevation: number = -42;
 	gameMap: GameMap;
 
 	constructor(options: TileOptions) {
@@ -25,7 +25,6 @@ export class Tile extends Container {
 		});
 		this.gameMap = options.gameMap;
 		this.pos = options.pos;
-		this.elevation = options.elevation;
 
 		const a = BASE_RADIUS;
 		const b = (BASE_RADIUS * Math.sqrt(3)) / 2;
@@ -48,6 +47,9 @@ export class Tile extends Container {
 	}
 
 	setElevation(elevation: number) {
+		if (this.elevation === elevation) {
+			return;
+		}
 		this.elevation = elevation;
 
 		let ids: string[] = [];
@@ -56,10 +58,13 @@ export class Tile extends Container {
 				ids = ["Blocker_Water_01"];
 				break;
 			case 0:
-				ids = ["Grass_01"]; //, "Grass_02", "Grass_03"];
+				ids = ["Blocker_Border_01"]; //, "Grass_02", "Grass_03"];
+				break;
+			case 0.5:
+				ids = ["Grass_01", "Grass_02", "Grass_03"];
 				break;
 			case 1:
-				ids = ["Ground_01"]; //, "Ground_02", "Ground_03"];
+				ids = ["Ground_01", "Ground_02", "Ground_03"];
 				break;
 			case 2:
 				ids = ["Mountain_Low_01"];

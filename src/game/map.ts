@@ -22,17 +22,19 @@ export const calculateElevation = (noise: PerlinNoise, pos: Pos) => {
 	});
 
 	let elevation;
-	if (data < -0.4) {
-		// Water
+	if (data < -0.35) {
+		// ^ Water
 		elevation = -1;
-	} else if (data < -0.15) {
+	} else if (data < -0.2) {
 		elevation = 0;
-	} else if (data < 0.5) {
-		// Mountains
+	} else if (data < -0.15) {
+		elevation = 0.5;
+	} else if (data < 0.3) {
+		// ^ Mountains
 		elevation = 1;
-	} else if (data < 0.6) {
+	} else if (data < 0.45) {
 		elevation = 2;
-	} else if (data < 0.65) {
+	} else if (data < 0.6) {
 		elevation = 3;
 	} else {
 		elevation = 4;
