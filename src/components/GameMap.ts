@@ -153,7 +153,7 @@ export class GameMap extends Container {
 			this.map.array[tile.pos.col][tile.pos.row] = newElevation;
 		}
 
-		// this.snake.pushAway();
+		this.snake.pushAway();
 	}
 
 	update(ticker: Ticker) {

@@ -22,7 +22,7 @@ export const calculateElevation = (noise: PerlinNoise, pos: Pos) => {
 	});
 
 	let elevation;
-	if (data < -0.3) {
+	if (data < -0.4) {
 		// Water
 		elevation = -1;
 	} else if (data < -0.15) {
@@ -30,7 +30,7 @@ export const calculateElevation = (noise: PerlinNoise, pos: Pos) => {
 	} else if (data < 0.1) {
 		// Mountains
 		elevation = 1;
-	} else if (data < 0.2) {
+	} else if (data < 0.3) {
 		elevation = 2;
 	} else if (data < 0.35) {
 		elevation = 3;
@@ -38,8 +38,8 @@ export const calculateElevation = (noise: PerlinNoise, pos: Pos) => {
 		elevation = 4;
 	}
 	if (
-		pos.col == 0 ||
-		pos.col == WIDTH - 1 ||
+		// pos.col == 0 ||
+		// pos.col == WIDTH - 1 ||
 		pos.row == 0 ||
 		pos.row == HEIGHT - 1
 	) {
@@ -257,5 +257,22 @@ export const applyDirection = ({ col, row }: Pos, direction: Direction) => {
 			return { col: col - mod(row + 1, 2) + 1, row: row + 1 };
 		case "left-down":
 			return { col: col - mod(row + 1, 2), row: row + 1 };
+	}
+};
+
+export const oppositeDirection = (direction: Direction) => {
+	switch (direction) {
+		case "left":
+			return "right";
+		case "left-up":
+			return "right-down";
+		case "right-up":
+			return "left-down";
+		case "right":
+			return "left";
+		case "right-down":
+			return "left-up";
+		case "left-down":
+			return "right-up";
 	}
 };

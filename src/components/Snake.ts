@@ -35,10 +35,11 @@ export class Snake extends Container {
 		{ col: WIDTH + 1, row: Math.round(HEIGHT / 2) },
 		{ col: WIDTH + 2, row: Math.round(HEIGHT / 2) },
 		{ col: WIDTH + 3, row: Math.round(HEIGHT / 2) },
+		{ col: WIDTH + 4, row: Math.round(HEIGHT / 2) },
 	];
 	nextSteps: Pos[] = [];
 	timer = 0;
-	direction: Direction = "left";
+	direction: Direction = "left-up";
 
 	constructor(options: SnakeOptions) {
 		super({
@@ -103,42 +104,88 @@ export class Snake extends Container {
 	}
 
 	pushAway() {
-		console.log(
-			"BEFORE",
-			this.parts.children.map((c) => c.pos),
-		);
-		let deadAt = -1;
-		this.parts.children.forEach((part, i) => {
-			if (deadAt >= 0) {
-				return;
-			}
-			const { col, row } = part.pos;
+		const isFreeAt = ({ col, row }: Pos) => {
 			const elevation = this.gameMap.map.array[col]?.[row];
-			if (elevation === undefined || (elevation >= 0 && elevation <= 1)) {
-				return;
+			if (elevation === undefined || elevation < 0 || elevation > 1) {
+				return false;
+			} else {
+				return true;
 			}
+		};
+
+		// console.log(
+		// 	"BEFORE",
+		// 	this.parts.children.map((c) => c.pos),
+		// );
+		let dead = false;
+		// const calculatedPos = [];
+		for (let i = 0; i < this.parts.children.length; i++) {
+			const part = this.parts.children[i];
+			// console.log("i", i, part.pos);
+			if (dead) {
+				// console.log("DEAD", part.pos);
+				this.parts.removeChild(part);
+				part.destroy();
+				i--;
+				continue;
+			}
+			if (
+				(i == 0 ||
+					hexDistance(this.parts.children[i - 1].pos, part.pos) ==
+						1) &&
+				isFreeAt(part.pos)
+			) {
+				// console.log("It’s ok at", part.pos);
+				// calculatedPos.push(part.pos);
+				continue;
+			}
+
 			const candidates = (
 				["left", "left-up", "left-down"] as const
 			).flatMap((direction) => {
 				const newPos = applyDirection(part.pos, direction);
 				if (
-					i == 0 ||
-					hexDistance(this.parts.children[i - 1].pos, newPos) == 1
+					(i == 0 ||
+						hexDistance(this.parts.children[i - 1].pos, newPos) ==
+							1) &&
+					isFreeAt(newPos)
 				) {
 					return [newPos];
 				} else {
 					return [];
 				}
 			});
+			// console.log(
+			// 	"abc",
+			// 	candidates.map((newPos) =>
+			// 		hexDistance(this.parts.children[i - 1].pos, newPos),
+			// 	),
+			// );
 			if (candidates.length > 0) {
 				part.pos = randomItem(candidates);
+				// calculatedPos.push(part.pos);
 			} else {
-				deadAt = i;
+				dead = true;
+				// console.log("DEAD!", part.pos);
+				part.destroy();
+				this.parts.removeChild(part);
+				i--;
 				// this.parts.children.splice(i, this.parts.children.length - i);
 				// dead = true;
 				// return;
 			}
-		});
+		}
+
+		// console.log(
+		// 	this.parts.children.map(
+		// 		(_, i) =>
+		// 			i > 0 &&
+		// 			hexDistance(
+		// 				this.parts.children[i - 1].pos,
+		// 				this.parts.children[i].pos,
+		// 			),
+		// 	),
+		// );
 
 		this.parts.children.forEach((part, i) => {
 			part.changeType(
@@ -149,16 +196,29 @@ export class Snake extends Container {
 				),
 			);
 		});
-		if (deadAt >= 0) {
-			for (const c of this.parts.removeChildren(deadAt)) {
-				c.destroy();
-			}
-		}
 
-		console.log(
-			"AFTER",
-			this.parts.children.map((c) => c.pos),
-		);
+		// console.log(
+		// 	this.parts.children.map(
+		// 		(_, i) =>
+		// 			i > 0 &&
+		// 			hexDistance(
+		// 				this.parts.children[i - 1].pos,
+		// 				this.parts.children[i].pos,
+		// 			),
+		// 	),
+		// );
+
+		// console.log(
+		// 	"free",
+		// 	this.parts.children.map((part) => isFreeAt(part.pos)),
+		// );
+
+		// console.log("calculated", calculatedPos);
+
+		// console.log(
+		// 	"AFTER",
+		// 	this.parts.children.map((c) => c.pos),
+		// );
 		// debugger;
 	}
 
@@ -172,6 +232,7 @@ export class Snake extends Container {
 		const xy = calculatePos(pos, RADIUS);
 		if (!prev) {
 			type = "head";
+			next ||= applyDirection(pos, oppositeDirection(this.direction));
 			const nextXY = calculatePos(next!, RADIUS);
 			rotation = Math.atan2(nextXY.y - xy.y, nextXY.x - xy.x);
 		} else if (!next) {
@@ -314,7 +375,6 @@ class SnakePart extends Container {
 	constructor(options: SnakePartOptions) {
 		super({
 			...options,
-			...calculatePos(options.pos, RADIUS),
 			scale: RADIUS / BASE_RADIUS,
 			eventMode: "none",
 		});
@@ -341,6 +401,9 @@ class SnakePart extends Container {
 		this.rotation = options.rotation || 0;
 		if (options.pos) {
 			this.pos = options.pos;
+			const { x, y } = calculatePos(options.pos, RADIUS);
+			this.x = x;
+			this.y = y;
 		}
 	}
 }

@@ -27,10 +27,11 @@ export class PerlinNoise {
 		this.height = height;
 
 		this.vectors = [];
+		const random = Math.random; //randomSeeded("abc");
 		for (let x = 0; x < width; x++) {
 			const col = [];
 			for (let y = 0; y < height; y++) {
-				const angle = randomRange(0, 2 * Math.PI);
+				const angle = randomRange(0, 2 * Math.PI, random);
 				col.push(angle);
 			}
 			this.vectors.push(col);
