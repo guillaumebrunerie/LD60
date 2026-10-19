@@ -28,7 +28,7 @@ export type Map = {
 export const calculateElevation = (
 	noise: PerlinNoise,
 	pos: Pos,
-	size: number,
+	{ size, factor }: Level,
 ) => {
 	const xy = calculatePos(pos, RADIUS);
 	let data = noise.sample({
@@ -43,6 +43,7 @@ export const calculateElevation = (
 	if (d < 10 * RADIUS) {
 		data *= d / (10 * RADIUS);
 	}
+	data *= factor;
 	// if (Math.abs(xy.x - RADIUS * 100) < RADIUS * 5) {
 	// 	data *= 2 - Math.abs(xy.x - RADIUS * 100) / (RADIUS * 5);
 	// }
@@ -70,7 +71,7 @@ export const calculateElevation = (
 };
 
 export const createMap = (
-	{ size, seed }: Level,
+	{ size, factor, seed }: Level,
 	forbiddenPositions: Pos[],
 ): Map => {
 	const noise = new PerlinNoise({ width: 5, height: 5, seed });
@@ -82,7 +83,11 @@ export const createMap = (
 		for (let row = 0; row < size * 2 + 1; row++) {
 			const pos = { col, row };
 
-			let elevation = calculateElevation(noise, pos, size);
+			let elevation = calculateElevation(noise, pos, {
+				size,
+				factor,
+				seed,
+			});
 			const d = hexDistance(pos, midPoint);
 			if (d > size) {
 				continue;

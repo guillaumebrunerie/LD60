@@ -81,14 +81,14 @@ export class Snake extends Container {
 				// Going left
 				case "ArrowUp/left":
 					if (event.shiftKey) {
-						this.changeDirection("left-down");
+						this.changeDirection("right-up");
 					} else {
 						this.changeDirection("left-up");
 					}
 					break;
 				case "ArrowDown/left":
 					if (event.shiftKey) {
-						this.changeDirection("left-up");
+						this.changeDirection("right-down");
 					} else {
 						this.changeDirection("left-down");
 					}
