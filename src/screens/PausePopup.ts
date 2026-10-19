@@ -59,49 +59,6 @@ export class PausePopup extends Container {
 			"pointertap",
 			async () => await navigation().resumeGame(),
 		);
-
-		// The reset progress button
-		const resetButton = container.addChild(
-			new FancyButton({
-				text: new Label({
-					text: `Reset all progress`,
-					style: {
-						fontFamily: "Roboto",
-						fill: "#D22",
-						fontWeight: "bold",
-						// stroke: { color: "black", width: 6 },
-						fontSize: 70,
-					},
-				}),
-			}),
-		);
-		resetButton.y = 150;
-		resetButton.on("pointertap", () => {
-			resetConfirmButton.visible = true;
-		});
-
-		// The confirm reset button, shown after clicking the reset button
-		const resetConfirmButton = container.addChild(
-			new FancyButton({
-				text: new Label({
-					text: `Confirm reset`,
-					style: {
-						fontFamily: "Roboto",
-						fill: "#D00",
-						fontWeight: "bold",
-						// stroke: { color: "black", width: 6 },
-						fontSize: 70,
-					},
-				}),
-			}),
-		);
-		resetConfirmButton.visible = false;
-		resetConfirmButton.y = 300;
-		resetConfirmButton.on("pointertap", () => this.onReset());
-	}
-
-	onReset() {
-		window.location.reload();
 	}
 
 	// /** Present the popup, animated */
