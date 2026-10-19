@@ -69,7 +69,10 @@ export const calculateElevation = (
 	return elevation;
 };
 
-export const createMap = ({ size, seed }: Level): Map => {
+export const createMap = (
+	{ size, seed }: Level,
+	forbiddenPositions: Pos[],
+): Map => {
 	const noise = new PerlinNoise({ width: 5, height: 5, seed });
 	const tiles: Map["tiles"] = [];
 	const array: number[][] = [];
@@ -94,8 +97,8 @@ export const createMap = ({ size, seed }: Level): Map => {
 
 	const map = { noise, array, tiles, apples: [], notes: [] };
 
-	for (let k = 0; k < 10; k++) {
-		addApple(map, size);
+	for (let k = 0; k < 3; k++) {
+		addApple(map, size, forbiddenPositions);
 	}
 
 	return map;
@@ -135,7 +138,7 @@ export const addApple = (
 	map: Map,
 	size: number,
 	forbiddenPositions: Pos[] = [],
-) => {
+): Pos | undefined => {
 	const pos = pickAvailablePosition(map, size, forbiddenPositions);
 	if (pos) {
 		map.apples.push(pos);

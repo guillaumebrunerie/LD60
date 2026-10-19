@@ -357,6 +357,10 @@ export class Snake extends Container {
 	headPos() {
 		return this.parts.children[0].pos;
 	}
+
+	allPositions() {
+		return this.parts.children.map((p) => p.pos);
+	}
 }
 
 type SnakePartType =
@@ -388,6 +392,7 @@ class SnakePart extends Container {
 			...options,
 			scale: RADIUS / BASE_RADIUS,
 			eventMode: "none",
+			alpha: 0.5,
 		});
 		this.setType(options);
 	}

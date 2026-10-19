@@ -10,13 +10,9 @@ import {
 	type Pos,
 	type XYPoint,
 } from "../game/map";
-import { Player } from "./Player";
-import { Target } from "./Target";
 import { Snake } from "./Snake";
 import { Apple } from "./Apple";
 import { RADIUS, SNAKE_SPEED } from "../configuration";
-import { Enemy } from "./Enemy";
-import { Note } from "./Note";
 import { clamp, length, mod } from "../utils/maths";
 import { level1 } from "../game/levels";
 import { Score } from "./Score";
@@ -30,13 +26,6 @@ type TilesOptions = ContainerOptions & {
 class Tiles extends Container {
 	constructor(options: TilesOptions) {
 		super({ ...options, interactive: true });
-
-		// this.on("pointertap", (event) => {
-		// 	const { x, y } = event.getLocalPosition(this.parent!);
-		// 	const i = Math.round(y / (TILE_SIZE / 2) + 1) / 2;
-		// 	const j = Math.round(x / (TILE_SIZE / 2) + 1) / 2;
-		// 	options.setPlayerTarget(i, j);
-		// });
 	}
 }
 
@@ -45,15 +34,9 @@ type GameMapOptions = ContainerOptions & {};
 export class GameMap extends Container {
 	map: Map;
 	tiles: Tile[] = [];
-	player: Player;
-	targets: Container<Target> = new Container<Target>();
 	apples: Container<Apple> = new Container<Apple>();
-	notes: Container<Note> = new Container<Note>();
-	enemies: Container<Enemy> = new Container<Enemy>();
 	snake: Snake;
 	scoreDisplay: Score;
-	// rotateLeft: RotateButton;
-	// rotateRight: RotateButton;
 	score = 0;
 
 	constructor(options: GameMapOptions) {
@@ -62,12 +45,6 @@ export class GameMap extends Container {
 		this.startGame();
 
 		// this.filters = [new CRTFilter(CRT_CONFIGURATION)];
-
-		window.addEventListener("keydown", (event) => {
-			if (event.code == "Space") {
-				// this.rotate(this.player.pos, 3, event.shiftKey ? -1 : 1);
-			}
-		});
 
 		let downPosition: XYPoint | undefined = undefined;
 		const threshold = 50;
@@ -124,64 +101,21 @@ export class GameMap extends Container {
 	}
 
 	tt: Tiles;
-	// viewport: Viewport;
 	startGame() {
 		this.score = 0;
 		this.scoreDisplay?.setScore(this.score);
 
-		// this.viewport = this.addChild(
-		// 	new Viewport({
-		// 		screenWidth: window.innerWidth,
-		// 		screenHeight: window.innerHeight,
-		// 		worldWidth: width,
-		// 		worldHeight: height,
-		// 		events: app().renderer.events,
-		// 	}),
-		// );
-
 		const tiles = (this.tt = this.addChild(new Tiles({})));
-		this.map = createMap(level1);
+
+		this.snake?.destroy();
+		this.snake = new Snake({ gameMap: this, level: level1 });
+
+		this.map = createMap(level1, this.snake.positions);
 
 		this.tiles.forEach((tile) => tile.destroy());
 		for (const { pos, elevation } of this.map.tiles) {
 			this.tiles.push(
 				tiles.addChild(new Tile({ gameMap: this, pos, elevation })),
-			);
-		}
-
-		this.targets.destroy();
-		this.targets = tiles.addChild(new Container<Target>());
-
-		this.player?.destroy();
-		// this.player = tiles.addChild(
-		// 	new Player({
-		// 		gameMap: this,
-		// 		pos: {
-		// 			col: Math.round(WIDTH / 2),
-		// 			row: Math.round(HEIGHT / 2),
-		// 		},
-		// 	}),
-		// );
-
-		this.enemies.destroy();
-		this.enemies = tiles.addChild(new Container<Enemy>());
-		// for (const pos of this.map.apples) {
-		// 	this.enemies.addChild(
-		// 		new Enemy({
-		// 			gameMap: this,
-		// 			pos,
-		// 		}),
-		// 	);
-		// }
-
-		this.notes.destroy();
-		this.notes = tiles.addChild(new Container<Note>());
-		for (const pos of this.map.notes) {
-			this.notes.addChild(
-				new Note({
-					gameMap: this,
-					pos,
-				}),
 			);
 		}
 
@@ -196,28 +130,7 @@ export class GameMap extends Container {
 			);
 		}
 
-		this.snake?.destroy();
-		this.snake = tiles.addChild(
-			new Snake({ gameMap: this, level: level1 }),
-		);
-		// this.snake.pickTarget(this.apples);
-		// this.rotateLeft = this.addChild(
-		// 	new RotateButton({
-		// 		x: 750,
-		// 		y: 1450,
-		// 		gameMap: this,
-		// 		steps: 1,
-		// 	}),
-		// );
-		// this.rotateRight = this.addChild(
-		// 	new RotateButton({
-		// 		x: 150,
-		// 		y: 1450,
-		// 		gameMap: this,
-		// 		scale: { x: -1, y: 1 },
-		// 		steps: -1,
-		// 	}),
-		// );
+		tiles.addChild(this.snake);
 
 		const dest = {
 			x: clamp(
@@ -338,9 +251,14 @@ export class GameMap extends Container {
 	collectAndRespawnApple(apple: Apple) {
 		apple.destroy();
 		apple.removeFromParent();
-		this.snake.pickTarget(this.apples);
+		this.map.apples = this.map.apples.filter(
+			(a) => a.col != apple.pos.col || a.row != apple.pos.row,
+		);
 
-		const newApple = addApple(this.map, level1.size, this.snake.positions);
+		const newApple = addApple(this.map, level1.size, [
+			...this.snake.allPositions(),
+			apple.pos,
+		]);
 		if (newApple) {
 			this.apples.addChild(
 				new Apple({

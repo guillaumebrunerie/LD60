@@ -1,4 +1,4 @@
-- Diamond idle
+- Shift arrows
 - All other screens
 - Levels
 - Avoid tiles with no exit
