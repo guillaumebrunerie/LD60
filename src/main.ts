@@ -25,7 +25,8 @@ import manifest from "./manifest.json";
 const main = async () => {
 	// Initialize the creation engine instance
 	await app.init({
-		backgroundAlpha: 0,
+		backgroundAlpha: 1,
+		backgroundColor: "#090a11",
 		resolution: window.devicePixelRatio || 1,
 	});
 
