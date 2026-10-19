@@ -1,4 +1,4 @@
-import { AnimatedSprite, Ticker, type ContainerOptions } from "pixi.js";
+import { AnimatedSprite, Assets, Ticker, type ContainerOptions } from "pixi.js";
 import { Container } from "../PausableContainer";
 import { Tile } from "./Tile";
 import {
@@ -280,11 +280,13 @@ export class GameMap extends Container {
 	}
 
 	collectAndRespawnApple(apple: Apple) {
-		apple.destroy();
-		apple.removeFromParent();
-		this.map.apples = this.map.apples.filter(
-			(a) => a.col != apple.pos.col || a.row != apple.pos.row,
-		);
+		apple.die(() => {
+			apple.destroy();
+			apple.removeFromParent();
+			this.map.apples = this.map.apples.filter(
+				(a) => a.col != apple.pos.col || a.row != apple.pos.row,
+			);
+		});
 
 		const newApple = addApple(this.map, level1.size, [
 			...this.snake.allPositions(),

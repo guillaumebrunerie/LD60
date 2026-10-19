@@ -41,6 +41,24 @@ export class Apple extends Container {
 		// );
 	}
 
+	die(then: () => void) {
+		this.removeChildren();
+		const anim = this.addChild(
+			new AnimatedSprite({
+				anchor: 0.5,
+				textures:
+					Assets.get("DiamondCollect").animations["DiamondCollect"],
+				autoPlay: true,
+				animationSpeed: 15 / 60,
+				loop: false,
+				eventMode: "none",
+			}),
+		);
+		anim.onComplete = () => {
+			then?.();
+		};
+	}
+
 	move(pos: Pos) {
 		const xy = calculatePos(pos, RADIUS);
 		this.animate(this, { ...xy }, { duration: 0.5 });
