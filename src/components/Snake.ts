@@ -2,6 +2,7 @@ import {
 	AnimatedSprite,
 	Assets,
 	Sprite,
+	Texture,
 	Ticker,
 	type ContainerOptions,
 } from "pixi.js";
@@ -68,6 +69,9 @@ export class Snake extends Container {
 				this.isRunning = true;
 			}
 			if (event.repeat) {
+				return;
+			}
+			if (this.gameMap.isGameOver) {
 				return;
 			}
 			switch (`${event.code}/${this.finalDirection()}`) {
@@ -452,7 +456,9 @@ export class Snake extends Container {
 		} else {
 			// New tail, turning from a body part
 			if (beforeTail2) {
-				beforeTail.morphTail();
+				beforeTail.morphTail(
+					this.createPart(beforeTail.pos, beforeTail2.pos, undefined),
+				);
 			}
 			// Old tail
 			tail.destroy();
@@ -549,13 +555,14 @@ class SnakePart extends Container {
 		);
 	}
 
-	morphTail() {
+	morphTail(options: SnakePartOptions) {
 		const animName =
 			{
 				"body-straight": "TailStraight",
 				"body-soft": "TailSoft",
 				"body-sharp": "TailSharp",
 			}[this.type] || "";
+		this.type = "tail";
 
 		this.removeChildren();
 		this.addChild(
@@ -569,6 +576,9 @@ class SnakePart extends Container {
 				loop: false,
 			}),
 		);
+
+		this.nextRotation = options.rotation || 0;
+		this.flipped = options.flipped || false;
 	}
 
 	morphBody() {
@@ -586,6 +596,37 @@ class SnakePart extends Container {
 				textures: Assets.get(animName).animations[animName],
 				animationSpeed: (SNAKE_SPEED / 60) * 10,
 				autoPlay: true,
+				scale: { x: 1, y: this.flipped ? -1 : 1 },
+				eventMode: "none",
+			}),
+		);
+	}
+
+	die() {
+		const animName =
+			{
+				tail: "SnakeEndDie",
+				"body-straight": "SnakeBodyDie_01",
+				"body-soft": "SnakeBodyDie_03",
+				"body-sharp": "SnakeBodyDie_02",
+				head: "SnakeHeadDie",
+			}[this.type] || "";
+		this.alpha = 1;
+		if (this.nextRotation !== undefined) {
+			this.rotation = this.nextRotation;
+		}
+
+		this.removeChildren();
+		this.addChild(
+			new AnimatedSprite({
+				anchor: 0.5,
+				textures: [
+					...Assets.get(animName).animations[animName],
+					Texture.EMPTY,
+				],
+				animationSpeed: 15 / 60,
+				autoPlay: true,
+				loop: false,
 				scale: { x: 1, y: this.flipped ? -1 : 1 },
 				eventMode: "none",
 			}),

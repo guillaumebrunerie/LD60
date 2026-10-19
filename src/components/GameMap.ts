@@ -163,15 +163,20 @@ export class GameMap extends Container {
 
 	isGameOver = false;
 	gameOver() {
+		if (this.isGameOver) {
+			return;
+		}
+		this.snake.queuedDirections = [];
 		audio.playSound("HitObstacle");
 		audio.playSound("SnakeDie2");
 		this.isGameOver = true;
 		for (const part of this.snake.parts.children) {
-			for (const child of part.children) {
-				if (child instanceof AnimatedSprite) {
-					child.stop();
-				}
-			}
+			// for (const child of part.children) {
+			// 	if (child instanceof AnimatedSprite) {
+			// 		child.stop();
+			// 	}
+			// }
+			part.die();
 		}
 		this.highScore = Math.max(this.highScore, this.score);
 		localStorage.setItem(highScoreKey, String(this.highScore));
@@ -182,11 +187,11 @@ export class GameMap extends Container {
 	}
 
 	update(ticker: Ticker) {
+		super.update(ticker);
+
 		if (this.isGameOver) {
 			return;
 		}
-
-		super.update(ticker);
 
 		const dest = {
 			x: -this.snake.parts.children[0].x,
