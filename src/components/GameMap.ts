@@ -32,6 +32,8 @@ class Tiles extends Container {
 
 type GameMapOptions = ContainerOptions & {};
 
+const highScoreKey = "hexnake-high-score";
+
 export class GameMap extends Container {
 	map: Map;
 	tiles: Tile[] = [];
@@ -39,6 +41,7 @@ export class GameMap extends Container {
 	snake: Snake;
 	scoreDisplay: Score;
 	score = 0;
+	highScore = Number(localStorage.getItem(highScoreKey) || 0) || 0;
 
 	constructor(options: GameMapOptions) {
 		super(options);
@@ -106,7 +109,7 @@ export class GameMap extends Container {
 		this.isGameOver = false;
 
 		this.score = 0;
-		this.scoreDisplay?.setScore(this.score);
+		this.scoreDisplay?.setScore(this.score, this.highScore);
 
 		const tiles = (this.tt = this.addChild(new Tiles({})));
 
@@ -154,7 +157,7 @@ export class GameMap extends Container {
 
 		this.scoreDisplay?.destroy();
 		this.scoreDisplay = this.addChild(new Score({ y: 700 }));
-		this.scoreDisplay?.setScore(this.score);
+		this.scoreDisplay?.setScore(this.score, this.highScore);
 	}
 
 	isGameOver = false;
@@ -167,6 +170,10 @@ export class GameMap extends Container {
 				}
 			}
 		}
+		this.highScore = Math.max(this.highScore, this.score);
+		localStorage.setItem(highScoreKey, String(this.highScore));
+		this.scoreDisplay?.setScore(this.score, this.highScore);
+
 		// this.startGame();
 		this.addChild(new GameOver({ onClick: () => this.startGame() }));
 	}

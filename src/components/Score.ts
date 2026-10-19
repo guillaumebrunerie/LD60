@@ -9,7 +9,7 @@ const style: TextStyleOptions = {
 	fill: "#DDD",
 	fontWeight: "bold",
 	stroke: { color: "black", width: 6 },
-	fontSize: 70,
+	fontSize: 50,
 };
 
 /** Popup that shows up when gameplay is paused */
@@ -34,7 +34,7 @@ export class Score extends Container {
 		);
 	}
 
-	setScore(score: number) {
-		this.score.text = `SCORE: ${score}`;
+	setScore(score: number, highScore: number) {
+		this.score.text = `SCORE: ${score}\nHIGH SCORE: ${highScore}`;
 	}
 }
