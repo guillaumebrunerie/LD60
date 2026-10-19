@@ -1,3 +1,2 @@
 - All other screens
 - Levels
-- Disallow multiples apples at the same place

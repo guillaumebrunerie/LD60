@@ -93,6 +93,13 @@ export const pickAvailablePosition = (map: Map, size: number) => {
 		if (elevation === undefined || elevation < 0 || elevation > 1) {
 			continue;
 		}
+		if (
+			map.apples.some(
+				(apple) => apple.col == pos.col && apple.row == pos.row,
+			)
+		) {
+			continue;
+		}
 		return pos;
 	}
 };
