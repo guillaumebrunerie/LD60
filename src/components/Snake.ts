@@ -372,13 +372,10 @@ export class Snake extends Container {
 				this.direction = nextDirection;
 			}
 			this.moveTo(applyDirection(this.headPos(), this.direction));
-			// this.moveTo(this.nextSteps.shift()!);
-			// this.nextSteps = [];
-			// this.pickTarget(this.gameMap.apples);
-		}
-
-		if (this.timer <= 0) {
 			this.timer = 1000 / SNAKE_SPEED;
+			if (this.isWarned) {
+				this.timer /= 2;
+			}
 		}
 		this.timer -= ticker.deltaMS;
 	}

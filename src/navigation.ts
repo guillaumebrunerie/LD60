@@ -28,7 +28,7 @@ export class Navigation extends Container {
 		await new Promise(requestAnimationFrame);
 		this.removeChild(loadScreen);
 		this.startScreen = this.addChild(new StartScreen());
-		this.startGame();
+		// this.startGame();
 
 		window.addEventListener("keydown", async (event) => {
 			if (event.code == "Digit1") {
