@@ -1,3 +1,4 @@
-- Queue the moves
-- All other screens
 - Score
+- All other screens
+- Levels
+- Disallow multiples apples at the same place

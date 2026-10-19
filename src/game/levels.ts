@@ -1,9 +1,9 @@
 export type Level = {
 	size: number;
-	seed: string;
+	seed?: string;
 };
 
 export const level1: Level = {
-	size: 10,
-	seed: "abc",
+	size: 15,
+	seed: undefined, //"abc",
 };

@@ -17,22 +17,12 @@ import { Player } from "./Player";
 import { Target } from "./Target";
 import { Snake } from "./Snake";
 import { Apple } from "./Apple";
-import { randomInt } from "../utils/random";
-import { CRTFilter } from "pixi-filters";
-import {
-	CRT_CONFIGURATION,
-	ENV_RATE,
-	ENV_SPEED,
-	HEIGHT,
-	RADIUS,
-	SNAKE_SPEED,
-	WIDTH,
-} from "../configuration";
-import { RotateButton } from "./RotateButton";
+import { ENV_RATE, RADIUS, SNAKE_SPEED } from "../configuration";
 import { Enemy } from "./Enemy";
 import { Note } from "./Note";
-import { clamp, getDistance, length, mod } from "../utils/maths";
+import { clamp, length, mod } from "../utils/maths";
 import { level1 } from "../game/levels";
+import { Score } from "./Score";
 // import { Viewport } from "pixi-viewport";
 // import { app } from "../getEngine";
 
@@ -64,8 +54,10 @@ export class GameMap extends Container {
 	notes: Container<Note> = new Container<Note>();
 	enemies: Container<Enemy> = new Container<Enemy>();
 	snake: Snake;
+	scoreDisplay: Score;
 	// rotateLeft: RotateButton;
 	// rotateRight: RotateButton;
+	score = 0;
 
 	constructor(options: GameMapOptions) {
 		super(options);
@@ -134,6 +126,8 @@ export class GameMap extends Container {
 	startGame() {
 		this.evolveTimer = 0;
 		this.dx = 0;
+		this.score = 0;
+		this.scoreDisplay?.setScore(this.score);
 
 		// this.viewport = this.addChild(
 		// 	new Viewport({
@@ -241,6 +235,10 @@ export class GameMap extends Container {
 		this.tt.y = dest.y;
 		this.dest.x = this.tt.x;
 		this.dest.y = this.tt.y;
+
+		this.scoreDisplay?.destroy();
+		this.scoreDisplay = this.addChild(new Score({ y: 700 }));
+		this.scoreDisplay?.setScore(this.score);
 
 		// this.viewport.follow(this.snake.parts.children[0]);
 	}
@@ -407,6 +405,8 @@ export class GameMap extends Container {
 					}),
 				);
 			}
+			this.score++;
+			this.scoreDisplay.setScore(this.score);
 			return true;
 		}
 		return false;

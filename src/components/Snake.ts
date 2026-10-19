@@ -41,6 +41,7 @@ export class Snake extends Container {
 	nextSteps: Pos[] = [];
 	timer = 0;
 	direction: Direction = "right";
+	queuedDirections: Direction[] = [];
 	isRunning = false;
 
 	constructor(options: SnakeOptions) {
@@ -70,49 +71,45 @@ export class Snake extends Container {
 		});
 
 		window.addEventListener("keydown", (event) => {
-			if (
-				["ArrowLeft", "ArrowUp", "ArrowRight", "ArrowDown"].includes(
-					event.code,
-				)
-			) {
+			if (event.code.startsWith("Arrow")) {
 				this.isRunning = true;
 			}
-			switch (`${event.code}/${this.direction}`) {
+			switch (`${event.code}/${this.finalDirection()}`) {
 				case "ArrowLeft/left-up":
 				case "ArrowLeft/left-down":
-					this.direction = "left";
+					this.changeDirection("left");
 					break;
 				case "ArrowLeft/right-up":
-					this.direction = "left-up";
+					this.changeDirection("left-up");
 					break;
 				case "ArrowLeft/right-down":
-					this.direction = "left-down";
+					this.changeDirection("left-down");
 					break;
 				case "ArrowRight/right-up":
 				case "ArrowRight/right-down":
-					this.direction = "right";
+					this.changeDirection("right");
 					break;
 				case "ArrowRight/left-up":
-					this.direction = "right-up";
+					this.changeDirection("right-up");
 					break;
 				case "ArrowRight/left-down":
-					this.direction = "right-down";
+					this.changeDirection("right-down");
 					break;
 				case "ArrowUp/left":
 				case "ArrowUp/left-down":
-					this.direction = "left-up";
+					this.changeDirection("left-up");
 					break;
 				case "ArrowUp/right":
 				case "ArrowUp/right-down":
-					this.direction = "right-up";
+					this.changeDirection("right-up");
 					break;
 				case "ArrowDown/left":
 				case "ArrowDown/left-up":
-					this.direction = "left-down";
+					this.changeDirection("left-down");
 					break;
 				case "ArrowDown/right":
 				case "ArrowDown/right-up":
-					this.direction = "right-down";
+					this.changeDirection("right-down");
 					break;
 			}
 		});
@@ -120,8 +117,19 @@ export class Snake extends Container {
 
 	changeDirection(newDirection: Direction) {
 		this.isRunning = true;
-		if (this.direction != oppositeDirection(newDirection)) {
-			this.direction = newDirection;
+		if (
+			newDirection != oppositeDirection(this.finalDirection()) &&
+			newDirection != this.finalDirection()
+		) {
+			this.queuedDirections.push(newDirection);
+		}
+	}
+
+	finalDirection() {
+		if (this.queuedDirections.length > 0) {
+			return this.queuedDirections[this.queuedDirections.length - 1];
+		} else {
+			return this.direction;
 		}
 	}
 
@@ -273,6 +281,10 @@ export class Snake extends Container {
 		// }
 
 		if (this.timer <= 0) {
+			const nextDirection = this.queuedDirections.shift();
+			if (nextDirection) {
+				this.direction = nextDirection;
+			}
 			this.moveTo(applyDirection(this.headPos(), this.direction));
 			// this.moveTo(this.nextSteps.shift()!);
 			// this.nextSteps = [];
