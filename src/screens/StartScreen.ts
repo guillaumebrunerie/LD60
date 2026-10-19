@@ -20,7 +20,15 @@ export class StartScreen extends Container {
 
 		container.addChild(
 			new Sprite({
+				texture: Assets.get("StartScreen.jpg"),
+				anchor: 0.5,
+			}),
+		);
+
+		container.addChild(
+			new Sprite({
 				texture: Assets.get("Logo.png"),
+				y: -200,
 				anchor: 0.5,
 			}),
 		);
@@ -31,7 +39,7 @@ export class StartScreen extends Container {
 				anchor: 0.5,
 			}),
 		);
-		startButton.y = 1920 / 4;
+		startButton.y = 600;
 		startButton.on("pointertap", () => this.startGame());
 
 		container.addChild(
