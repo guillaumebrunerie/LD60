@@ -164,6 +164,7 @@ export class GameMap extends Container {
 	isGameOver = false;
 	gameOver() {
 		audio.playSound("HitObstacle");
+		audio.playSound("SnakeDie2");
 		this.isGameOver = true;
 		for (const part of this.snake.parts.children) {
 			for (const child of part.children) {
