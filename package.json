@@ -8,7 +8,7 @@
     "build": "vite build # && rm -rf cordova/www && cp -r dist cordova/www",
     "lint": "tsc && eslint .",
     "dev": "vite --host",
-    "pack": "npm run build && rm LD60.zip && zip -r LD60.zip dist"
+    "pack": "npm run build && rm -f Hexnake.zip && zip -r Hexnake.zip dist"
   },
   "dependencies": {
     "@pixi/sound": "^6.0.1",

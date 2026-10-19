@@ -54,8 +54,8 @@ export class GameMap extends Container {
 		let downPosition: XYPoint | undefined = undefined;
 		const threshold = 50;
 		window.addEventListener("keydown", (event) => {
-			if (event.code == "KeyR") {
-				this.gameOver();
+			if (event.code == "Space" && this.isGameOver) {
+				this.startGame();
 			}
 		});
 		window.addEventListener("pointerdown", (event) => {
