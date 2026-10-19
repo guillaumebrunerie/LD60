@@ -264,7 +264,7 @@ export class GameMap extends Container {
 		if (apple) {
 			this.collectAndRespawnApple(apple);
 			this.score++;
-			this.scoreDisplay.setScore(this.score);
+			this.scoreDisplay.setScore(this.score, this.highScore);
 			return true;
 		}
 		return false;
