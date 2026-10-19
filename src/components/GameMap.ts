@@ -1,4 +1,4 @@
-import { AnimatedSprite, Ticker, type ContainerOptions } from "pixi.js";
+import { AnimatedSprite, Assets, Ticker, type ContainerOptions } from "pixi.js";
 import { Container } from "../PausableContainer";
 import { Tile } from "./Tile";
 import {
@@ -163,15 +163,20 @@ export class GameMap extends Container {
 
 	isGameOver = false;
 	gameOver() {
+		if (this.isGameOver) {
+			return;
+		}
+		this.snake.queuedDirections = [];
 		audio.playSound("HitObstacle");
 		audio.playSound("SnakeDie2");
 		this.isGameOver = true;
 		for (const part of this.snake.parts.children) {
-			for (const child of part.children) {
-				if (child instanceof AnimatedSprite) {
-					child.stop();
-				}
-			}
+			// for (const child of part.children) {
+			// 	if (child instanceof AnimatedSprite) {
+			// 		child.stop();
+			// 	}
+			// }
+			part.die();
 		}
 		this.highScore = Math.max(this.highScore, this.score);
 		localStorage.setItem(highScoreKey, String(this.highScore));
@@ -182,11 +187,11 @@ export class GameMap extends Container {
 	}
 
 	update(ticker: Ticker) {
+		super.update(ticker);
+
 		if (this.isGameOver) {
 			return;
 		}
-
-		super.update(ticker);
 
 		const dest = {
 			x: -this.snake.parts.children[0].x,
@@ -275,11 +280,13 @@ export class GameMap extends Container {
 	}
 
 	collectAndRespawnApple(apple: Apple) {
-		apple.destroy();
-		apple.removeFromParent();
-		this.map.apples = this.map.apples.filter(
-			(a) => a.col != apple.pos.col || a.row != apple.pos.row,
-		);
+		apple.die(() => {
+			apple.destroy();
+			apple.removeFromParent();
+			this.map.apples = this.map.apples.filter(
+				(a) => a.col != apple.pos.col || a.row != apple.pos.row,
+			);
+		});
 
 		const newApple = addApple(this.map, level1.size, [
 			...this.snake.allPositions(),
