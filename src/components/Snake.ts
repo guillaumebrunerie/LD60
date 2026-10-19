@@ -1,4 +1,10 @@
-import { Assets, Sprite, Ticker, type ContainerOptions } from "pixi.js";
+import {
+	AnimatedSprite,
+	Assets,
+	Sprite,
+	Ticker,
+	type ContainerOptions,
+} from "pixi.js";
 import { Container } from "../PausableContainer";
 import {
 	applyDirection,
@@ -204,6 +210,7 @@ export class Snake extends Container {
 	}
 
 	pushAway() {
+		return;
 		const isFreeAt = ({ col, row }: Pos, i: number) => {
 			const elevation = this.gameMap.map.array[col]?.[row];
 			if (elevation === undefined || elevation < 0 || elevation > 1) {
@@ -289,6 +296,7 @@ export class Snake extends Container {
 	): SnakePartOptions {
 		let type: SnakePartType;
 		let rotation;
+		let flipped = false;
 		const xy = calculatePos(pos, RADIUS);
 		if (!prev) {
 			type = "head";
@@ -318,18 +326,25 @@ export class Snake extends Container {
 				case 2:
 					type = "body-soft";
 					rotation = Math.atan2(nextXY.y - xy.y, nextXY.x - xy.x);
+					// flipped = true;
 					break;
 				case 3:
 					type = "body-straight";
-					rotation = Math.atan2(prevXY.y - xy.y, prevXY.x - xy.x);
+					rotation = Math.atan2(nextXY.y - xy.y, nextXY.x - xy.x);
 					break;
 				case 4:
 					type = "body-soft";
-					rotation = Math.atan2(prevXY.y - xy.y, prevXY.x - xy.x);
+					rotation =
+						Math.atan2(prevXY.y - xy.y, prevXY.x - xy.x) +
+						(Math.PI * 4) / 3;
+					flipped = true;
 					break;
 				case 5:
 					type = "body-sharp";
-					rotation = Math.atan2(prevXY.y - xy.y, prevXY.x - xy.x);
+					rotation =
+						Math.atan2(prevXY.y - xy.y, prevXY.x - xy.x) +
+						(Math.PI * -1) / 3;
+					flipped = true;
 					break;
 			}
 		}
@@ -337,6 +352,7 @@ export class Snake extends Container {
 			pos,
 			type,
 			rotation,
+			flipped,
 		};
 	}
 
@@ -401,11 +417,11 @@ export class Snake extends Container {
 			return true;
 		};
 		if (!isFreeAt(newPos)) {
-			// if (this.isWarned) {
-			this.gameMap.gameOver();
-			// } else {
-			// 	this.isWarned = true;
-			// }
+			if (this.isWarned) {
+				this.gameMap.gameOver();
+			} else {
+				this.isWarned = true;
+			}
 			return;
 		}
 		this.isWarned = false;
@@ -417,23 +433,29 @@ export class Snake extends Container {
 		const tail = this.parts.children.at(-1)!;
 
 		// New head
-		this.parts.addChildAt(
+		const newHead = this.parts.addChildAt(
 			new SnakePart(this.createPart(newPos, undefined, head.pos)),
 			0,
 		);
-		head.setType(this.createPart(head.pos, newPos, afterHead?.pos));
-		if (!this.isGrowing) {
-			if (beforeTail2) {
-				beforeTail.setType(
-					this.createPart(beforeTail.pos, beforeTail2.pos, undefined),
-				);
-			}
-			tail.destroy();
-		}
-		this.isGrowing = false;
+		newHead.alpha = 0;
+
+		// Old head, turning into a body part
+		head.morphHead(this.createPart(head.pos, newPos, afterHead?.pos));
+		afterHead.morphBody();
 
 		if (this.gameMap.maybeEatApple(newPos)) {
 			this.isGrowing = true;
+		}
+
+		if (this.isGrowing) {
+			this.isGrowing = false;
+		} else {
+			// New tail, turning from a body part
+			if (beforeTail2) {
+				beforeTail.morphTail();
+			}
+			// Old tail
+			tail.destroy();
 		}
 	}
 
@@ -451,6 +473,7 @@ type SnakePartType =
 type SnakePartOptions = ContainerOptions & {
 	pos: Pos;
 	type: SnakePartType;
+	flipped: boolean;
 };
 
 const getSnakeTexture = (type: SnakePartType) => {
@@ -475,10 +498,11 @@ class SnakePart extends Container {
 			...options,
 			scale: RADIUS / BASE_RADIUS,
 			eventMode: "none",
-			alpha: 0.5,
 		});
 		this.setType(options);
 	}
+	type: SnakePartType = "tail";
+	flipped = false;
 
 	setType(options: SnakePartOptions) {
 		this.removeChildren();
@@ -489,6 +513,7 @@ class SnakePart extends Container {
 				eventMode: "none",
 			}),
 		);
+		this.type = options.type;
 		this.rotation = options.rotation || 0;
 		if (options.pos) {
 			this.pos = options.pos;
@@ -496,5 +521,74 @@ class SnakePart extends Container {
 			this.x = x;
 			this.y = y;
 		}
+	}
+
+	morphHead(options: SnakePartOptions) {
+		this.alpha = 1;
+		this.rotation = options.rotation || 0;
+		const animName =
+			{
+				"body-straight": "HeadStraight",
+				"body-soft": "HeadSoft",
+				"body-sharp": "HeadSharp",
+			}[options.type] || "";
+		this.type = options.type;
+		this.flipped = options.flipped;
+
+		this.removeChildren();
+		this.addChild(
+			new AnimatedSprite({
+				anchor: 0.5,
+				textures: Assets.get(animName).animations[animName],
+				animationSpeed: (SNAKE_SPEED / 60) * 10,
+				autoPlay: true,
+				scale: { x: 1, y: options.flipped ? -1 : 1 },
+				eventMode: "none",
+				loop: false,
+			}),
+		);
+	}
+
+	morphTail() {
+		const animName =
+			{
+				"body-straight": "TailStraight",
+				"body-soft": "TailSoft",
+				"body-sharp": "TailSharp",
+			}[this.type] || "";
+
+		this.removeChildren();
+		this.addChild(
+			new AnimatedSprite({
+				anchor: 0.5,
+				textures: Assets.get(animName).animations[animName],
+				animationSpeed: (SNAKE_SPEED / 60) * 10,
+				autoPlay: true,
+				scale: { x: 1, y: this.flipped ? -1 : 1 },
+				eventMode: "none",
+				loop: false,
+			}),
+		);
+	}
+
+	morphBody() {
+		const animName =
+			{
+				"body-straight": "BodyStraight",
+				"body-soft": "BodySoft",
+				"body-sharp": "BodySharp",
+			}[this.type] || "";
+
+		this.removeChildren();
+		this.addChild(
+			new AnimatedSprite({
+				anchor: 0.5,
+				textures: Assets.get(animName).animations[animName],
+				animationSpeed: (SNAKE_SPEED / 60) * 10,
+				autoPlay: true,
+				scale: { x: 1, y: this.flipped ? -1 : 1 },
+				eventMode: "none",
+			}),
+		);
 	}
 }

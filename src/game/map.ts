@@ -102,7 +102,7 @@ export const createMap = (
 
 	const map = { noise, array, tiles, apples: [], notes: [] };
 
-	for (let k = 0; k < 3; k++) {
+	for (let k = 0; k < 5; k++) {
 		addApple(map, size, forbiddenPositions);
 	}
 
