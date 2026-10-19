@@ -37,9 +37,13 @@ export class Navigation extends Container {
 				// Do nothing
 			}
 		}
-		this.gameScreen = this.addChild(new MapScreen({ alpha: 0 }));
-		await this.animate(this.gameScreen, { alpha: 1 }, { duration: 0.5 });
+		this.gameScreen = this.addChildAt(new MapScreen(), 0);
 		if (this.startScreen) {
+			await this.animate(
+				this.startScreen,
+				{ alpha: 0 },
+				{ duration: 0.5 },
+			);
 			this.removeChild(this.startScreen);
 		}
 	}

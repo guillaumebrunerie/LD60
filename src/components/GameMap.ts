@@ -16,6 +16,7 @@ import { RADIUS, SNAKE_SPEED } from "../configuration";
 import { clamp, length, mod } from "../utils/maths";
 import { level1 } from "../game/levels";
 import { Score } from "./Score";
+import { GameOver } from "../screens/GameOverPopup";
 // import { Viewport } from "pixi-viewport";
 // import { app } from "../getEngine";
 
@@ -102,6 +103,8 @@ export class GameMap extends Container {
 
 	tt: Tiles;
 	startGame() {
+		this.isGameOver = false;
+
 		this.score = 0;
 		this.scoreDisplay?.setScore(this.score);
 
@@ -152,8 +155,6 @@ export class GameMap extends Container {
 		this.scoreDisplay?.destroy();
 		this.scoreDisplay = this.addChild(new Score({ y: 700 }));
 		this.scoreDisplay?.setScore(this.score);
-
-		// this.viewport.follow(this.snake.parts.children[0]);
 	}
 
 	isGameOver = false;
@@ -167,6 +168,7 @@ export class GameMap extends Container {
 			}
 		}
 		// this.startGame();
+		this.addChild(new GameOver({ onClick: () => this.startGame() }));
 	}
 
 	update(ticker: Ticker) {
