@@ -1,11 +1,4 @@
-import {
-	Assets,
-	Color,
-	Graphics,
-	Sprite,
-	Ticker,
-	type ContainerOptions,
-} from "pixi.js";
+import { Assets, Sprite, Ticker, type ContainerOptions } from "pixi.js";
 import { Container } from "../PausableContainer";
 import {
 	applyDirection,
@@ -17,13 +10,7 @@ import {
 	type Pos,
 } from "../game/map";
 import type { GameMap } from "./GameMap";
-import {
-	BASE_RADIUS,
-	HEIGHT,
-	RADIUS,
-	SNAKE_SPEED,
-	WIDTH,
-} from "../configuration";
+import { BASE_RADIUS, RADIUS, SNAKE_SPEED } from "../configuration";
 import { mod } from "../utils/maths";
 import type { Apple } from "./Apple";
 import { randomItem } from "../utils/random";

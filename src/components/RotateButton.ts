@@ -1,16 +1,7 @@
-import {
-	Assets,
-	Color,
-	Graphics,
-	Sprite,
-	Ticker,
-	type ContainerOptions,
-} from "pixi.js";
+import { Assets, Sprite, type ContainerOptions } from "pixi.js";
 import { Container } from "../PausableContainer";
-import { calculatePos, type Pos } from "../game/map";
+import type { Pos } from "../game/map";
 import type { GameMap } from "./GameMap";
-import { RADIUS, SPEED } from "../configuration";
-import { length } from "../utils/maths";
 
 type RotateButtonOptions = ContainerOptions & {
 	gameMap: GameMap;
@@ -53,6 +44,4 @@ export class RotateButton extends Container {
 			this.gameMap.rotate(this.gameMap.player.pos, 3, options.steps);
 		});
 	}
-
-	update(ticker: Ticker) {}
 }

@@ -4,6 +4,6 @@ export type Level = {
 };
 
 export const level1: Level = {
-	size: 15,
-	seed: undefined, //"abc",
+	size: 10,
+	seed: undefined,
 };

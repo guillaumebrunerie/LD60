@@ -1,2 +1,6 @@
+- Diamond idle
 - All other screens
 - Levels
+- Avoid tiles with no exit
+- Avoid non-connected grids
+- Avoid corridors (cells that divide the plan in two disjoint parts)

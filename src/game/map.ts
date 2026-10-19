@@ -1,11 +1,21 @@
-import { ELEVATION_SCALE, HEIGHT, RADIUS, SIZE, WIDTH } from "../configuration";
-import { mod } from "../utils/maths";
+import { ELEVATION_SCALE, RADIUS } from "../configuration";
+import { getDistance, mod } from "../utils/maths";
 import { PerlinNoise } from "../utils/perlinNoise";
 import { randomInt } from "../utils/random";
 import type { Level } from "./levels";
 
 export type Pos = { col: number; row: number };
 export type XYPoint = { x: number; y: number };
+
+const distanceSq = (xyA: XYPoint, xyB: XYPoint) => {
+	const dx = xyB.x - xyA.x;
+	const dy = xyB.y - xyA.y;
+	return dx * dx + dy * dy;
+};
+
+const distance = (xyA: XYPoint, xyB: XYPoint) => {
+	return Math.sqrt(distanceSq(xyA, xyB));
+};
 
 export type Map = {
 	noise: PerlinNoise;
@@ -15,7 +25,11 @@ export type Map = {
 	notes: Pos[];
 };
 
-export const calculateElevation = (noise: PerlinNoise, pos: Pos) => {
+export const calculateElevation = (
+	noise: PerlinNoise,
+	pos: Pos,
+	size: number,
+) => {
 	const xy = calculatePos(pos, RADIUS);
 	let data = noise.sample({
 		x: xy.x / RADIUS / ELEVATION_SCALE,
@@ -25,6 +39,10 @@ export const calculateElevation = (noise: PerlinNoise, pos: Pos) => {
 	// 	data *= Math.pow(xy.x / (RADIUS * 15), 2);
 	// }
 
+	const d = distance(xy, { x: RADIUS * 5, y: size * RADIUS * 1.5 });
+	if (d < 10 * RADIUS) {
+		data *= d / (10 * RADIUS);
+	}
 	// if (Math.abs(xy.x - RADIUS * 100) < RADIUS * 5) {
 	// 	data *= 2 - Math.abs(xy.x - RADIUS * 100) / (RADIUS * 5);
 	// }
@@ -61,7 +79,7 @@ export const createMap = ({ size, seed }: Level): Map => {
 		for (let row = 0; row < size * 2 + 1; row++) {
 			const pos = { col, row };
 
-			let elevation = calculateElevation(noise, pos);
+			let elevation = calculateElevation(noise, pos, size);
 			const d = hexDistance(pos, midPoint);
 			if (d > size) {
 				continue;

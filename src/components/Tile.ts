@@ -39,11 +39,6 @@ export class Tile extends Container {
 		]);
 
 		this.setElevation(options.elevation);
-
-		this.onpointerdown = () => {
-			this.gameMap.clearTargets();
-			// this.gameMap.addTarget(this.pos);
-		};
 	}
 
 	setElevation(elevation: number) {

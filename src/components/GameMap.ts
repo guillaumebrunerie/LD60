@@ -1,12 +1,9 @@
-import { Point, Ticker, type ContainerOptions } from "pixi.js";
+import { Ticker, type ContainerOptions } from "pixi.js";
 import { Container } from "../PausableContainer";
 import { Tile } from "./Tile";
 import {
 	addApple,
-	calculateElevation,
-	calculatePos,
 	createMap,
-	findBestPath,
 	hexDistance,
 	rotate,
 	type Map,
@@ -74,6 +71,11 @@ export class GameMap extends Container {
 
 		let downPosition: XYPoint | undefined = undefined;
 		const threshold = 50;
+		window.addEventListener("keydown", (event) => {
+			if (event.code == "KeyR") {
+				this.gameOver();
+			}
+		});
 		window.addEventListener("pointerdown", (event) => {
 			downPosition = { x: event.clientX, y: event.clientY };
 		});
@@ -410,38 +412,5 @@ export class GameMap extends Container {
 			return true;
 		}
 		return false;
-	}
-
-	removeTarget(pos: Pos) {
-		const target = this.targets.children.find(
-			(target) =>
-				target.pos.col === pos.col && target.pos.row === pos.row,
-		);
-		if (target) {
-			this.targets.removeChild(target);
-		}
-	}
-
-	clearTargets() {
-		this.player.nextSteps = [];
-		this.targets.removeChildren();
-	}
-
-	addTarget(pos: Pos) {
-		const pathAndDistance = findBestPath(
-			this.map,
-			[], //this.snake.parts.children.map((part) => part.pos),
-			this.player.lastStep() || this.player.pos,
-			[pos],
-		);
-		if (!pathAndDistance) {
-			return;
-		}
-		const { path } = pathAndDistance;
-		for (const step of path) {
-			this.player.nextSteps.push(step);
-			this.targets.addChild(new Target({ gameMap: this, pos: step }));
-			// this.snake.nextSteps.push(step);
-		}
 	}
 }

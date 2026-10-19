@@ -1,4 +1,4 @@
-import { Assets, Sprite, type ContainerOptions } from "pixi.js";
+import type { ContainerOptions } from "pixi.js";
 import { Container } from "../PausableContainer";
 import { calculatePos, type Pos } from "../game/map";
 import type { GameMap } from "./GameMap";

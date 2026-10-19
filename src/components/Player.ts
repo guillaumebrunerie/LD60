@@ -1,4 +1,4 @@
-import { Color, Graphics, Ticker, type ContainerOptions } from "pixi.js";
+import { Ticker, type ContainerOptions } from "pixi.js";
 import { Container } from "../PausableContainer";
 import { calculatePos, type Pos } from "../game/map";
 import type { GameMap } from "./GameMap";
@@ -49,7 +49,6 @@ export class Player extends Container {
 			this.x = nextStepXY.x;
 			this.y = nextStepXY.y;
 			this.pos = nextStep;
-			this.gameMap.removeTarget(nextStep);
 		} else {
 			const angle = Math.atan2(vector.y, vector.x);
 			this.x += Math.cos(angle) * distance;
