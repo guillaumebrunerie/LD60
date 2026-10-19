@@ -17,6 +17,7 @@ import { clamp, length, mod } from "../utils/maths";
 import { level1 } from "../game/levels";
 import { Score } from "./Score";
 import { GameOver } from "../screens/GameOverPopup";
+import { audio } from "../audio/audio";
 // import { Viewport } from "pixi-viewport";
 // import { app } from "../getEngine";
 
@@ -162,6 +163,7 @@ export class GameMap extends Container {
 
 	isGameOver = false;
 	gameOver() {
+		audio.playSound("HitObstacle");
 		this.isGameOver = true;
 		for (const part of this.snake.parts.children) {
 			for (const child of part.children) {
@@ -262,6 +264,7 @@ export class GameMap extends Container {
 			(apple) => apple.pos.col == pos.col && apple.pos.row == pos.row,
 		);
 		if (apple) {
+			audio.playSound("Collect");
 			this.collectAndRespawnApple(apple);
 			this.score++;
 			this.scoreDisplay.setScore(this.score, this.highScore);

@@ -4,6 +4,7 @@ import { navigation } from "../getEngine";
 import { Label } from "../components/Label";
 import { FancyButton } from "@pixi/ui";
 import { Container } from "../PausableContainer";
+import { audio } from "../audio/audio";
 
 export class GameOver extends Container {
 	constructor(options?: ContainerOptions & { onClick: () => void }) {
@@ -51,7 +52,10 @@ export class GameOver extends Container {
 			}),
 		);
 		resumeButton.y = -75;
-		resumeButton.on("pointertap", () => options.onClick());
+		resumeButton.on("pointertap", () => {
+			options?.onClick();
+			audio.playSound("Click");
+		});
 	}
 
 	onReset() {
