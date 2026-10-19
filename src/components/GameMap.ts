@@ -1,4 +1,4 @@
-import { Ticker, type ContainerOptions } from "pixi.js";
+import { AnimatedSprite, Ticker, type ContainerOptions } from "pixi.js";
 import { Container } from "../PausableContainer";
 import { Tile } from "./Tile";
 import {
@@ -156,11 +156,24 @@ export class GameMap extends Container {
 		// this.viewport.follow(this.snake.parts.children[0]);
 	}
 
+	isGameOver = false;
 	gameOver() {
-		this.startGame();
+		this.isGameOver = true;
+		for (const part of this.snake.parts.children) {
+			for (const child of part.children) {
+				if (child instanceof AnimatedSprite) {
+					child.stop();
+				}
+			}
+		}
+		// this.startGame();
 	}
 
 	update(ticker: Ticker) {
+		if (this.isGameOver) {
+			return;
+		}
+
 		super.update(ticker);
 
 		const dest = {

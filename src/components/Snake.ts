@@ -67,6 +67,9 @@ export class Snake extends Container {
 			if (event.code.startsWith("Arrow")) {
 				this.isRunning = true;
 			}
+			if (event.repeat) {
+				return;
+			}
 			switch (`${event.code}/${this.finalDirection()}`) {
 				// Going right
 				case "ArrowUp/right":
@@ -414,11 +417,11 @@ export class Snake extends Container {
 			return true;
 		};
 		if (!isFreeAt(newPos)) {
-			if (this.isWarned) {
-				this.gameMap.gameOver();
-			} else {
-				this.isWarned = true;
-			}
+			// if (this.isWarned) {
+			this.gameMap.gameOver();
+			// } else {
+			// 	this.isWarned = true;
+			// }
 			return;
 		}
 		this.isWarned = false;
