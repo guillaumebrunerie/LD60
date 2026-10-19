@@ -65,6 +65,9 @@ export class GameMap extends Container {
 			downPosition = undefined;
 		});
 		window.addEventListener("pointermove", (event) => {
+			if (this.isGameOver) {
+				return;
+			}
 			if (
 				downPosition &&
 				length({
