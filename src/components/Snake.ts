@@ -62,41 +62,96 @@ export class Snake extends Container {
 				this.isRunning = true;
 			}
 			switch (`${event.code}/${this.finalDirection()}`) {
-				case "ArrowLeft/left-up":
-				case "ArrowLeft/left-down":
-					this.changeDirection("left");
+				// Going right
+				case "ArrowUp/right":
+					if (event.shiftKey) {
+						this.changeDirection("left-up");
+					} else {
+						this.changeDirection("right-up");
+					}
 					break;
+				case "ArrowDown/right":
+					if (event.shiftKey) {
+						this.changeDirection("left-down");
+					} else {
+						this.changeDirection("right-down");
+					}
+					break;
+
+				// Going left
+				case "ArrowUp/left":
+					if (event.shiftKey) {
+						this.changeDirection("left-down");
+					} else {
+						this.changeDirection("left-up");
+					}
+					break;
+				case "ArrowDown/left":
+					if (event.shiftKey) {
+						this.changeDirection("left-up");
+					} else {
+						this.changeDirection("left-down");
+					}
+					break;
+
+				// Going right-up
 				case "ArrowLeft/right-up":
-					this.changeDirection("left-up");
-					break;
-				case "ArrowLeft/right-down":
-					this.changeDirection("left-down");
+					if (event.shiftKey) {
+						this.changeDirection("left");
+					} else {
+						this.changeDirection("left-up");
+					}
 					break;
 				case "ArrowRight/right-up":
+					this.changeDirection("right");
+					break;
+				case "ArrowDown/right-up":
+					this.changeDirection("right-down");
+					break;
+
+				// Going right-down
+				case "ArrowLeft/right-down":
+					if (event.shiftKey) {
+						this.changeDirection("left");
+					} else {
+						this.changeDirection("left-down");
+					}
+					break;
 				case "ArrowRight/right-down":
 					this.changeDirection("right");
 					break;
-				case "ArrowRight/left-up":
-					this.changeDirection("right-up");
-					break;
-				case "ArrowRight/left-down":
-					this.changeDirection("right-down");
-					break;
-				case "ArrowUp/left":
-				case "ArrowUp/left-down":
-					this.changeDirection("left-up");
-					break;
-				case "ArrowUp/right":
 				case "ArrowUp/right-down":
 					this.changeDirection("right-up");
 					break;
-				case "ArrowDown/left":
+
+				// Going left-up
+				case "ArrowLeft/left-up":
+					this.changeDirection("left");
+					break;
+				case "ArrowRight/left-up":
+					if (event.shiftKey) {
+						this.changeDirection("right");
+					} else {
+						this.changeDirection("right-up");
+					}
+					break;
 				case "ArrowDown/left-up":
 					this.changeDirection("left-down");
 					break;
-				case "ArrowDown/right":
-				case "ArrowDown/right-up":
-					this.changeDirection("right-down");
+
+				// Going left-down
+				case "ArrowLeft/left-down":
+					this.changeDirection("left");
+					break;
+				case "ArrowRight/left-down":
+					if (event.shiftKey) {
+						this.changeDirection("right");
+					} else {
+						this.changeDirection("right-down");
+					}
+					break;
+				case "ArrowUp/left-down":
+					this.changeDirection("left-up");
 					break;
 			}
 		});
