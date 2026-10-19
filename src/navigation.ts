@@ -14,7 +14,6 @@ export class Navigation extends Container {
 
 	startScreen?: StartScreen;
 	gameScreen?: MapScreen;
-	// playgroundScreen?: PlaygroundScreen;
 
 	async loadGame() {
 		// Show the loading screen and start loading the main bundle
@@ -28,26 +27,6 @@ export class Navigation extends Container {
 		await new Promise(requestAnimationFrame);
 		this.removeChild(loadScreen);
 		this.startScreen = this.addChild(new StartScreen());
-		// this.startGame();
-
-		window.addEventListener("keydown", async (event) => {
-			if (event.code == "Digit1") {
-				await this.loadPlayground();
-			}
-		});
-	}
-
-	async loadPlayground() {
-		if (this.startScreen) {
-			this.removeChild(this.startScreen);
-		}
-		if (this.gameScreen) {
-			this.removeChild(this.gameScreen);
-		}
-		// if (this.playgroundScreen) {
-		// 	this.removeChild(this.playgroundScreen);
-		// }
-		// this.playgroundScreen = this.addChild(new PlaygroundScreen());
 	}
 
 	async startGame() {
