@@ -14,7 +14,7 @@ import { Player } from "./Player";
 import { Target } from "./Target";
 import { Snake } from "./Snake";
 import { Apple } from "./Apple";
-import { ENV_RATE, RADIUS, SNAKE_SPEED } from "../configuration";
+import { RADIUS, SNAKE_SPEED } from "../configuration";
 import { Enemy } from "./Enemy";
 import { Note } from "./Note";
 import { clamp, length, mod } from "../utils/maths";
@@ -126,8 +126,6 @@ export class GameMap extends Container {
 	tt: Tiles;
 	// viewport: Viewport;
 	startGame() {
-		this.evolveTimer = 0;
-		this.dx = 0;
 		this.score = 0;
 		this.scoreDisplay?.setScore(this.score);
 
@@ -249,73 +247,8 @@ export class GameMap extends Container {
 		this.startGame();
 	}
 
-	evolveTimer = 0;
-
-	dx = 0;
-	evolve() {
-		for (let a = 0; a < this.map.noise.vectors.length; a++) {
-			for (let b = 0; b < this.map.noise.vectors[0].length; b++) {
-				// this.map.noise.vectors[a][b] += 0.002;
-			}
-		}
-		// for (const tile of this.tiles) {
-		// 	const x = calculatePos(tile.pos).x;
-		// 	const isLeft = false; //x + this.tt.x <= 50;
-		// 	const newElevation =
-		// 		isLeft ? 5 : (
-		// 			calculateElevation(this.map.noise, {
-		// 				col: tile.pos.col + this.dx,
-		// 				row: tile.pos.row,
-		// 			})
-		// 		);
-		// 	tile.setElevation(newElevation);
-		// 	this.map.array[tile.pos.col][tile.pos.row] = newElevation;
-		// }
-
-		this.snake.pushAway();
-	}
-
 	update(ticker: Ticker) {
 		super.update(ticker);
-		// this.filters[0].time +=
-		// 	(ticker.deltaMS / 1000) * CRT_CONFIGURATION.speed;
-
-		if (this.evolveTimer < 0) {
-			// this.dx += ENV_SPEED / ENV_RATE;
-			this.evolve();
-			this.evolveTimer = 1000 / ENV_RATE;
-		}
-		this.evolveTimer -= ticker.deltaMS;
-		// if (this.tt.x > -RADIUS * 100) {
-		// this.tt.x -=
-		// 	((ENV_SPEED * ticker.deltaMS) / 1000) * RADIUS * Math.sqrt(3);
-		// }
-
-		for (const apple of this.apples.children) {
-			if (apple.pos.col < this.snake.headPos().col - 30) {
-				apple.destroy();
-				apple.removeFromParent();
-				this.snake.pickTarget(this.apples);
-
-				const newApple = addApple(this.map, level1.size);
-				if (newApple) {
-					this.apples.addChild(
-						new Apple({
-							gameMap: this,
-							pos: newApple,
-						}),
-					);
-				}
-			}
-		}
-
-		// const leftThreshold = -50;
-		// if (
-		// 	calculatePos(this.snake.headPos(), RADIUS).x + this.tt.x <
-		// 	leftThreshold
-		// ) {
-		// 	this.gameOver();
-		// }
 
 		const dest = {
 			x: -this.snake.parts.children[0].x,
@@ -394,23 +327,27 @@ export class GameMap extends Container {
 			(apple) => apple.pos.col == pos.col && apple.pos.row == pos.row,
 		);
 		if (apple) {
-			apple.destroy();
-			apple.removeFromParent();
-			this.snake.pickTarget(this.apples);
-
-			const newApple = addApple(this.map, this.snake.headPos().col);
-			if (newApple) {
-				this.apples.addChild(
-					new Apple({
-						gameMap: this,
-						pos: newApple,
-					}),
-				);
-			}
+			this.collectAndRespawnApple(apple);
 			this.score++;
 			this.scoreDisplay.setScore(this.score);
 			return true;
 		}
 		return false;
+	}
+
+	collectAndRespawnApple(apple: Apple) {
+		apple.destroy();
+		apple.removeFromParent();
+		this.snake.pickTarget(this.apples);
+
+		const newApple = addApple(this.map, level1.size, this.snake.positions);
+		if (newApple) {
+			this.apples.addChild(
+				new Apple({
+					gameMap: this,
+					pos: newApple,
+				}),
+			);
+		}
 	}
 }

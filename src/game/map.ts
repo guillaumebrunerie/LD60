@@ -94,19 +94,28 @@ export const createMap = ({ size, seed }: Level): Map => {
 
 	const map = { noise, array, tiles, apples: [], notes: [] };
 
-	for (let k = 0; k < 3; k++) {
+	for (let k = 0; k < 10; k++) {
 		addApple(map, size);
 	}
 
 	return map;
 };
 
-export const pickAvailablePosition = (map: Map, size: number) => {
-	for (let tries = 0; tries < 100; tries++) {
+export const pickAvailablePosition = (
+	map: Map,
+	size: number,
+	forbiddenPositions: Pos[] = [],
+) => {
+	for (let tries = 0; tries < 1000; tries++) {
 		const pos = {
 			col: randomInt(0, 2 * size),
 			row: randomInt(0, 2 * size),
 		};
+		if (
+			forbiddenPositions.some((p) => p.col == pos.col && p.row == pos.row)
+		) {
+			continue;
+		}
 		const elevation = map.array[pos.col]?.[pos.row];
 		if (elevation === undefined || elevation < 0 || elevation > 1) {
 			continue;
@@ -122,8 +131,12 @@ export const pickAvailablePosition = (map: Map, size: number) => {
 	}
 };
 
-export const addApple = (map: Map, size: number) => {
-	const pos = pickAvailablePosition(map, size);
+export const addApple = (
+	map: Map,
+	size: number,
+	forbiddenPositions: Pos[] = [],
+) => {
+	const pos = pickAvailablePosition(map, size, forbiddenPositions);
 	if (pos) {
 		map.apples.push(pos);
 	}
