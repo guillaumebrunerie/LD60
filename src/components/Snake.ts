@@ -105,8 +105,15 @@ export class Snake extends Container {
 				case "ArrowRight/right-up":
 					this.changeDirection("right");
 					break;
+				case "ArrowUp/right-up":
+					this.changeDirection("left-up");
+					break;
 				case "ArrowDown/right-up":
-					this.changeDirection("right-down");
+					if (event.shiftKey) {
+						this.changeDirection("right-down");
+					} else {
+						this.changeDirection("right");
+					}
 					break;
 
 				// Going right-down
@@ -120,14 +127,18 @@ export class Snake extends Container {
 				case "ArrowRight/right-down":
 					this.changeDirection("right");
 					break;
+				case "ArrowDown/right-down":
+					this.changeDirection("left-down");
+					break;
 				case "ArrowUp/right-down":
-					this.changeDirection("right-up");
+					if (event.shiftKey) {
+						this.changeDirection("right-up");
+					} else {
+						this.changeDirection("right");
+					}
 					break;
 
 				// Going left-up
-				case "ArrowLeft/left-up":
-					this.changeDirection("left");
-					break;
 				case "ArrowRight/left-up":
 					if (event.shiftKey) {
 						this.changeDirection("right");
@@ -135,14 +146,21 @@ export class Snake extends Container {
 						this.changeDirection("right-up");
 					}
 					break;
+				case "ArrowLeft/left-up":
+					this.changeDirection("left");
+					break;
+				case "ArrowUp/left-up":
+					this.changeDirection("right-up");
+					break;
 				case "ArrowDown/left-up":
-					this.changeDirection("left-down");
+					if (event.shiftKey) {
+						this.changeDirection("left-down");
+					} else {
+						this.changeDirection("left");
+					}
 					break;
 
 				// Going left-down
-				case "ArrowLeft/left-down":
-					this.changeDirection("left");
-					break;
 				case "ArrowRight/left-down":
 					if (event.shiftKey) {
 						this.changeDirection("right");
@@ -150,8 +168,18 @@ export class Snake extends Container {
 						this.changeDirection("right-down");
 					}
 					break;
+				case "ArrowLeft/left-down":
+					this.changeDirection("left");
+					break;
+				case "ArrowDown/left-down":
+					this.changeDirection("right-down");
+					break;
 				case "ArrowUp/left-down":
-					this.changeDirection("left-up");
+					if (event.shiftKey) {
+						this.changeDirection("left-up");
+					} else {
+						this.changeDirection("left");
+					}
 					break;
 			}
 		});
